@@ -1,6 +1,6 @@
 import sys
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QTextEdit, QMainWindow, QAction, QMenu, QMessageBox
+from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QTextEdit, QMainWindow, QAction, QMenu, QMessageBox, QGridLayout
 from datetime import datetime
 import easygui
 import json
@@ -26,7 +26,7 @@ from veitzQueryToolFunctions import api_status, json_search, confcheck, stringti
 from io import StringIO
 import contextlib
 
-
+from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QGridLayout, QTextEdit
 
 
 
@@ -49,14 +49,35 @@ class MyWidget(QWidget):
         self.text_edit.append("")
         self.text_edit.append(">>>")
 
-        button1 = QPushButton('button1 -> buy Bitcoin', self)
+        grid_layout = QGridLayout()
+
+        button1 = QPushButton('-> buy Bitcoin', self)
+        button1.setStyleSheet("background-color: #bfe5ad;")
         button1.clicked.connect(self.button1Clicked)
-        layout.addWidget(button1)
+        grid_layout.addWidget(button1, 0, 0)
 
-        button2 = QPushButton('button2 <- sell Bitcoin', self)
+        button2 = QPushButton('<- sell Bitcoin', self)
+        button2.setStyleSheet("background-color: #f09292;")
         button2.clicked.connect(self.button2Clicked)
-        layout.addWidget(button2)
+        grid_layout.addWidget(button2, 0, 1)
 
+        button3 = QPushButton('-> buy Ethereum', self)
+        button3.setStyleSheet("background-color: #bfe5ad;")
+        button3.clicked.connect(self.button3Clicked)
+        grid_layout.addWidget(button3, 1, 0)
+
+        button4 = QPushButton('<- sell Ethereum', self)
+        button4.setStyleSheet("background-color: #f09292;")
+        button4.clicked.connect(self.button4Clicked)
+        grid_layout.addWidget(button4, 1, 1)
+
+        # Exit Button hinzugefügt
+        exitbutton = QPushButton('Exit', self)
+        exitbutton.setStyleSheet("background-color: #f0f0f0; color: #333333; border: 1px solid #cccccc;")
+        exitbutton.clicked.connect(self.buttonExitClicked)
+        layout.addWidget(exitbutton)
+
+        layout.addLayout(grid_layout)
         self.setLayout(layout)
 
     def button1Clicked(self):
@@ -73,7 +94,24 @@ class MyWidget(QWidget):
         except:
             self.text_edit.append("error in button2 sell-method")
 
+    def button3Clicked(self):
+        print("Button 3 clicked")
 
+    def button4Clicked(self):
+        print("Button 4 clicked")
+
+    def buttonExitClicked(self):
+        reply = QMessageBox.question(self, 'Bestätigung',
+                                     "Möchten Sie das Programm wirklich beenden?",
+                                     QMessageBox.Yes | QMessageBox.No,
+                                     QMessageBox.No)
+        if reply == QMessageBox.Yes:
+            sys.exit()
+
+
+
+
+        
 
 
 class MyMainWindow(QMainWindow):
@@ -85,7 +123,7 @@ class MyMainWindow(QMainWindow):
 
         self.initMenu()
 
-        self.setGeometry(500, 300, 864, 480)
+        self.setGeometry(500, 300, 1024, 768) # def setGeometry (x, y, w, h)   # https://doc.qt.io/qtforpython-5/PySide2/QtWidgets/QWidget.html
         self.setWindowTitle(" veitzQueryTool :: GUI :: QT5 ")
 
         app_icon = QIcon("icon.png")
@@ -119,16 +157,6 @@ class MyMainWindow(QMainWindow):
 
 
 
-        fileMenu = menubar.addMenu('Settings')
-        configinfoAction = QAction('config Info/Update', self)
-        configinfoAction.triggered.connect(self.config_info)  # Hier wird die Methode test aufgerufen
-        fileMenu.addAction(configinfoAction)
-        showconfigAction = QAction('show config.ini', self)
-        showconfigAction.triggered.connect(self.show_config)  # Hier wird die Methode test aufgerufen
-        fileMenu.addAction(showconfigAction)
-
-
-
         fileMenu = menubar.addMenu('Trading')
         btcinfoAction = QAction('show BTC Value', self)
         btcinfoAction.triggered.connect(self.btc_info)
@@ -142,6 +170,16 @@ class MyMainWindow(QMainWindow):
         openordersAction = QAction('show open Orders', self)
         openordersAction.triggered.connect(self.open_orders)
         fileMenu.addAction(openordersAction)
+
+
+
+        fileMenu = menubar.addMenu('Settings')
+        configinfoAction = QAction('config Info/Update', self)
+        configinfoAction.triggered.connect(self.config_info)  # Hier wird die Methode test aufgerufen
+        fileMenu.addAction(configinfoAction)
+        showconfigAction = QAction('show config.ini', self)
+        showconfigAction.triggered.connect(self.show_config)  # Hier wird die Methode test aufgerufen
+        fileMenu.addAction(showconfigAction)
 
 
 
@@ -319,6 +357,7 @@ def main():
     app = QApplication(sys.argv)
     #ex = MyMainWindow() #ori
     window = MyMainWindow()
+    window.close()
     window.show()      # wird hier ausgeführt: def __init__(self):
     sys.exit(app.exec_())
 
