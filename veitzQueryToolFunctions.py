@@ -2,7 +2,6 @@ import sys
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QTextEdit, QMainWindow, QAction, QMenu, QMessageBox
 from datetime import datetime
-import easygui
 import json
 import os
 import webbrowser
@@ -13,19 +12,35 @@ from math import floor      # Funktion zum Abrunden von float
 import pandas as pd
 from pathlib import Path
 import http.client          # only for delete_stopp_loss_order or closing all orders atm
-import pyfiglet
-
-from tkinter import *
-import tkinter
-import tkinter.messagebox
-from tkinter.scrolledtext import ScrolledText
-from tkinter import font
+import pprint
 
 
 
-def hellowelt():
-    #return "HelloWorld!"
-    print("HelloWelt!")
+def orderbook_btc_snap_ask():
+    conn = http.client.HTTPSConnection("api.onetrading.com")
+    headers = {'Accept': "application/json"}
+    conn.request("GET", "/fast/v1/order-book/BTC_EUR", headers=headers)
+    res = conn.getresponse()
+
+    dat = res.read()
+    data = dat.decode("utf-8")
+    jdata = json.loads(data)
+    jsonask = jdata['asks'][0]['price']
+    return jsonask
+
+
+def orderbook_btc_snap_bid():
+    conn = http.client.HTTPSConnection("api.onetrading.com")
+    headers = {'Accept': "application/json"}
+    conn.request("GET", "/fast/v1/order-book/BTC_EUR", headers=headers)
+    res = conn.getresponse()
+
+    dat = res.read()
+    data = dat.decode("utf-8")
+    jdata = json.loads(data)
+    jsonbid = jdata['bids'][0]['price']
+    return jsonbid
+
 
 
 def stringtimenow():
@@ -54,7 +69,7 @@ def api_status():
     print("market state BTC-EUR:", jsonelement, "json-value:", btcval)
     jsonelement = jdata[ethval]['state']
     print("market state ETH-EUR:", jsonelement, "json-value:", ethval, "\n")
-    print("Infos: https://api.onetrading.com/fast/v1 - REST API & \n https://docs.onetrading.com/#fast-upgrade--- \n")
+    #print("Infos: https://api.onetrading.com/fast/v1 - REST API & \n https://docs.onetrading.com/#fast-upgrade--- \n")
     print("")
     print(">>>")
 #api_status()
@@ -82,11 +97,12 @@ def json_search():
         data = json.loads(f.read())
     # create dataframe
     df = pd.json_normalize(data)
-    #pd.set_option('display.max_columns', None)
+    pd.set_option('display.max_columns', None)
     #pd.set_option("display.max_rows", 200)
     #pd.set_option("display.max_columns", 100)
     #pd.set_option("display.max_colwidth", 200)
     print(df)
+    #pprint.pprint(data)
     # save to csv
     df.to_csv('jsontmp.csv', index=False, encoding='utf-8')
     # number of row
@@ -105,6 +121,28 @@ def json_search():
     print("")
     print(">>>")
 #json_search()
+
+def json_search2():
+    """Ausgabe aller Wertepaare und deren Information."""
+    headers = {
+        'Accept': 'application/json'
+    }
+    r = requests.get('https://api.onetrading.com/fast/v1/market-ticker', params={
+        "instrument_code": "BTC_EUR"
+    }, headers=headers)
+    data = json.dumps(r.json())
+    # write json to file
+    with open("jsontmp.json", "w") as f:
+        f.write(data)
+    # set path to file
+    p = Path(r'jsontmp.json')
+    # read json
+    with p.open('r', encoding='utf-8') as f:
+        data = json.loads(f.read())
+    # create dataframe
+    pprint.pprint(data)
+    print("")
+    print(">>>")
 
 
 def confcheck():
@@ -189,7 +227,7 @@ def btcinfonow():
     j = r.json()
     #print(j)
     #h = j[int(btcval)]['time']
-    print("- aktuelle BTC Informationen -")
+    print("- aktuelle BTC Informationen in € -")
     print('Zeitstempel: ', str(datetime.now()))
     f = j[int(btcval)]['last_price']
     print('last_price: ', f)
@@ -201,5 +239,112 @@ def btcinfonow():
     print('high 24h  : ', n)
     m = j[int(btcval)]['low']
     print('low 24h   : ', m)
+    btc_book_ask = orderbook_btc_snap_ask()
+    btc_book_sell = orderbook_btc_snap_bid()
+    spreadbook =  float(btc_book_ask) - float(btc_book_sell)
+    print('orderbook buy: ', btc_book_ask)
+    print('orderbook sell: ', btc_book_sell)
+    print('spread: ', round(spreadbook,2))
     print("")
     print(">>>")
+
+
+def show_last100():
+    """zeige die letzten 100 Trades"""
+    config = configparser.ConfigParser()
+    config.read('CONFIG.INI')
+    bpkey = str(config['DEFAULT']['apikey'])
+    headers = {
+        'Accept': 'application/json',
+        'Authorization': bpkey
+    }
+    r = requests.get('https://api.onetrading.com/fast/v1/account/trades', params={
+    }, headers=headers)
+    print("- Liste der letzten 100 Trades -")
+    print(r.json())
+    data = json.dumps(r.json())
+    # write json to file
+    with open("tmp.json", "w") as f:
+        f.write(data)
+    # open json in browser
+    filename = "tmp.json"
+    webbrowser.open('file://' + os.path.realpath(filename))
+    print("")
+    sleep(3)
+    os.remove("tmp.json")
+    print("cleaning up tempfiles done!")
+    print("")
+    print(">>>")
+#show_last100_trigger()
+
+
+def walletinfo():
+    """gibt die Wallet-Balance aus"""
+    def btcBestBid():
+        """gibt den aktuellen btc marktpreis zurück. wird für die berechnung des btc amount im fiatwallet benötig"""
+        headers = {
+            'Accept': 'application/json'
+        }
+        r = requests.get('https://api.onetrading.com/fast/v1/market-ticker', params={
+            "instrument_code": "BTC_EUR"
+        }, headers=headers)
+        j = r.json()
+        config = configparser.ConfigParser()
+        config.read('CONFIG.INI')
+        btcval = int(config['DEFAULT']['coinvalbtc'])
+        return j[int(btcval)]['last_price']               # best bid btc, zur Berechnung
+
+    def ethBestBid():
+        """gibt den aktuellen eth marktpreis zurück. wird für die berechnung des eth amount im fiatwallet benötig"""
+        headers = {
+            'Accept': 'application/json'
+        }
+        r = requests.get('https://api.onetrading.com/fast/v1/market-ticker', params={
+            "instrument_code": "ETH_EUR"
+        }, headers=headers)
+        j = r.json()
+        config = configparser.ConfigParser()
+        config.read('CONFIG.INI')
+        ethval = int(config['DEFAULT']['coinvaleth'])
+        return j[int(ethval)]['last_price']               # best bid eth, zur Berechnung
+
+    config = configparser.ConfigParser()
+    config.read('CONFIG.INI')
+    bpkey = str(config['DEFAULT']['apikey'])
+    headers = {
+        'Accept': 'application/json',
+        'Authorization': bpkey
+    }
+    r = requests.get('https://api.onetrading.com/fast/v1/account/balances', params={
+    }, headers=headers)
+    # print(r.json())
+    j = r.json()
+    e = j['balances']
+    #print(e)
+    #print(btcBestBid())
+    #print(ethBestBid())
+    try:
+        print("- aktuelle Werte der Wallet's -")
+        print("currency_code: ", e[3]['currency_code'])
+        print("available:     ", e[3]['available'], "sind ", float(btcBestBid()) * float(e[3]['available']), "€" )
+        print("currency_code: ", e[1]['currency_code'])
+        print("available:     ", e[1]['available'], "sind ", float(ethBestBid()) * float(e[1]['available']), "€" )
+        print("currency_code: ", e[2]['currency_code'])
+        print("available:     ", e[2]['available'])
+        #print("currency_code: ", e[0]['currency_code'])
+        #print("available:     ", e[0]['available'])
+        #print("currency_code: ", e[4]['currency_code'])
+        #print("available:     ", e[4]['available'])
+        print('HINWEIS: Currencies mit gesetztem Stop-Loss sind LOCKED und werden daher nicht angezeigt!')
+    except KeyError:
+        print("ERROR: in api_getbalance.py or JSON doesn't exist")
+    print("")
+    print(">>>")
+
+
+def changelog():
+    with open('changelog.md', 'r') as info:
+        for line in info:
+            print(line)
+        print("")
+        print(">>>")

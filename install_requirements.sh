@@ -16,6 +16,4 @@ pip3 install math
 pip3 install easygui
 pip3 install pandas
 pip3 install pathlib
-pip3 install path
-pip3 install http
-pip3 install pyfiglet
+pip3 install Path

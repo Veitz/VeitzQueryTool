@@ -1,8 +1,8 @@
 import sys
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QTextEdit, QMainWindow, QAction, QMenu, QMessageBox, QGridLayout
+from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QGridLayout, QTextEdit, QMainWindow, QAction, QLabel, QMenu, QMessageBox, QGridLayout
+import pyfiglet
 from datetime import datetime
-import easygui
 import json
 import os
 import webbrowser
@@ -13,20 +13,11 @@ from math import floor      # Funktion zum Abrunden von float
 import pandas as pd
 from pathlib import Path
 import http.client          # only for delete_stopp_loss_order or closing all orders atm
-import pyfiglet
-
-from tkinter import *
-import tkinter
-import tkinter.messagebox
-from tkinter.scrolledtext import ScrolledText
-from tkinter import font
-
 import veitzQueryToolFunctions
 from veitzQueryToolFunctions import api_status, json_search, confcheck, stringtimenow
 from io import StringIO
 import contextlib
 
-from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QGridLayout, QTextEdit
 
 
 
@@ -39,15 +30,27 @@ class MyWidget(QWidget):
     def initUI(self):
         layout = QVBoxLayout()
 
+        # Pyfiglet-Text als QLabel anzeigen
+        figlet_text = pyfiglet.figlet_format("          VeitzQueryTool")
+        figlet_label = QLabel(figlet_text, self)
+        figlet_label.setStyleSheet("font-family: monospace; font-size: 15px; text-align: center;")
+        layout.addWidget(figlet_label)
+
+        # hier Text_Edit
         self.text_edit = QTextEdit(self)
         #self.text_edit.setStyleSheet("background-color: black; color: white;")  # Stiländerungen hier
         layout.addWidget(self.text_edit)
 
-        ascii_banner = pyfiglet.figlet_format("VeitzQueryTool")     # in der Console
-        print(ascii_banner)
-        self.text_edit.append("pending... ")
-        self.text_edit.append("")
-        self.text_edit.append(">>>")
+        #ascii_banner = pyfiglet.figlet_format("VeitzQueryTool")     # in der Console
+        #print(ascii_banner)
+
+        # Starteintrag
+        try:
+            self.text_edit.append("Datetime: " + stringtimenow() + "\n")
+            with redirect_stdout_ext(self.text_edit):
+                veitzQueryToolFunctions.json_search()
+        except Exception as e:
+            self.text_edit.append(f"Error at startup: {e}")
 
         grid_layout = QGridLayout()
 
@@ -60,7 +63,7 @@ class MyWidget(QWidget):
         button2.setStyleSheet("background-color: #f09292;")
         button2.clicked.connect(self.button2Clicked)
         grid_layout.addWidget(button2, 0, 1)
-
+        """
         button3 = QPushButton('-> buy Ethereum', self)
         button3.setStyleSheet("background-color: #bfe5ad;")
         button3.clicked.connect(self.button3Clicked)
@@ -70,7 +73,7 @@ class MyWidget(QWidget):
         button4.setStyleSheet("background-color: #f09292;")
         button4.clicked.connect(self.button4Clicked)
         grid_layout.addWidget(button4, 1, 1)
-
+        """
         # Exit Button hinzugefügt
         exitbutton = QPushButton('Exit', self)
         exitbutton.setStyleSheet("background-color: #f0f0f0; color: #333333; border: 1px solid #cccccc;")
@@ -83,22 +86,24 @@ class MyWidget(QWidget):
     def button1Clicked(self):
         try:
             self.text_edit.append("Datetime: " + stringtimenow())
-            self.text_edit.append("du hast button1 gedrückt (buy) \n")
+            self.text_edit.append("coming soon... (buy) \n")
         except:
             self.text_edit.append("error in button1 buy-method")
 
     def button2Clicked(self):
         try:
             self.text_edit.append("Datetime: " + stringtimenow())
-            self.text_edit.append("einen kleinen Moment bitte ... das war button2 (sell) \n")
+            self.text_edit.append("coming soon... (sell) \n")
         except:
             self.text_edit.append("error in button2 sell-method")
 
     def button3Clicked(self):
-        print("Button 3 clicked")
+        QMessageBox.information(self, 'Information', 'buy Ethereum action\n \n'
+                                                     'in development...')
 
     def button4Clicked(self):
-        print("Button 4 clicked")
+        QMessageBox.information(self, 'Information', 'sell Ethereum action\n \n'
+                                                     'in development...')
 
     def buttonExitClicked(self):
         reply = QMessageBox.question(self, 'Bestätigung',
@@ -123,7 +128,7 @@ class MyMainWindow(QMainWindow):
 
         self.initMenu()
 
-        self.setGeometry(500, 300, 1024, 768) # def setGeometry (x, y, w, h)   # https://doc.qt.io/qtforpython-5/PySide2/QtWidgets/QWidget.html
+        self.setGeometry(500, 300, 850, 768) # def setGeometry (x, y, w, h)   # https://doc.qt.io/qtforpython-5/PySide2/QtWidgets/QWidget.html
         self.setWindowTitle(" veitzQueryTool :: GUI :: QT5 ")
 
         app_icon = QIcon("icon.png")
@@ -167,6 +172,14 @@ class MyMainWindow(QMainWindow):
         feargreedAction = QAction('show Fear and Greed Index', self)
         feargreedAction.triggered.connect(self.fear_greed)
         fileMenu.addAction(feargreedAction)
+        fileMenu.addSeparator()
+        mywalletAction = QAction('show myWallet', self)
+        mywalletAction.triggered.connect(self.my_wallet)
+        fileMenu.addAction(mywalletAction)
+        fileMenu.addSeparator()
+        shlast100Action = QAction('show last 100 trades', self)
+        shlast100Action.triggered.connect(self.show_last100)
+        fileMenu.addAction(shlast100Action)
         openordersAction = QAction('show open Orders', self)
         openordersAction.triggered.connect(self.open_orders)
         fileMenu.addAction(openordersAction)
@@ -184,6 +197,9 @@ class MyMainWindow(QMainWindow):
 
 
         infoMenu = menubar.addMenu('Info')
+        changelogAction = QAction('Changelog', self)
+        changelogAction.triggered.connect(self.change_log)
+        infoMenu.addAction(changelogAction)
         infoAction = QAction('About', self)
         infoAction.triggered.connect(self.showInfo)
         infoMenu.addAction(infoAction)
@@ -192,14 +208,21 @@ class MyMainWindow(QMainWindow):
 
 
 
-
-
     ### function for menu ###
 
+    def change_log(self):
+        # Aktion des Menüeintrags # aus externer Funktion
+        try:
+            self.central_widget.text_edit.append("Datetime: " + stringtimenow())
+            with redirect_stdout_ext(self.central_widget.text_edit):
+                veitzQueryToolFunctions.changelog()
+        except Exception as e:
+            self.central_widget.text_edit.append(f"Error in running external cc(): {e}")
+            #self.text_edit.append(f"Error in running external cc(): {e}")
+
     def showInfo(self):
-        QMessageBox.information(self, 'Information', 'veitzQueryToolPyQT5 - v2.0-dev\n'
-                                        'Changelog:\n \n'
-                                        '- pyQT5 release_version \n')
+        QMessageBox.information(self, 'Information', 'veitzQueryTool made with PyQT5 \n \n'
+                                        'v2.0-dev')
 
 
 
@@ -210,7 +233,7 @@ class MyMainWindow(QMainWindow):
 
 
     def btc_info(self):
-        # Aktion des Menüeintrags # aus interner Funktion
+        # Aktion des Menüeintrags # aus externer Funktion
         try:
             self.central_widget.text_edit.append("Datetime: " + stringtimenow())
             with redirect_stdout_ext(self.central_widget.text_edit):
@@ -220,7 +243,7 @@ class MyMainWindow(QMainWindow):
             #self.text_edit.append(f"Error in running external cc(): {e}")
 
     def eth_info(self):
-        # Aktion des Menüeintrags # aus interner Funktion
+        # Aktion des Menüeintrags # aus externer Funktion
         try:
             self.central_widget.text_edit.append("Datetime: " + stringtimenow())
             with redirect_stdout_ext(self.central_widget.text_edit):
@@ -230,7 +253,7 @@ class MyMainWindow(QMainWindow):
             #self.text_edit.append(f"Error in running external cc(): {e}")
 
     def fear_greed(self):
-        # Aktion des Menüeintrags # aus interner Funktion
+        # Aktion des Menüeintrags # aus externer Funktion
         try:
             self.central_widget.text_edit.append("Datetime: " + stringtimenow())
             with redirect_stdout_ext(self.central_widget.text_edit):
@@ -246,9 +269,28 @@ class MyMainWindow(QMainWindow):
             with redirect_stdout_int(self.central_widget.text_edit):
                 self.openorder()
         except:
-            self.central_widget.text_edit.append(f"Error in running external cc(): {e}")
-            #self.central_widget.text_edit.append("error in openorders(self) method \n")
+            #self.central_widget.text_edit.append(f"Error in running external cc(): {e}")
+            self.central_widget.text_edit.append("error in openorders(self) method \n")
 
+    def my_wallet(self):
+        # Aktion des Menüeintrags # aus externer Funktion
+        try:
+            self.central_widget.text_edit.append("Datetime: " + stringtimenow())
+            with redirect_stdout_ext(self.central_widget.text_edit):
+                veitzQueryToolFunctions.walletinfo()
+        except Exception as e:
+            self.central_widget.text_edit.append(f"Error: maybe in running external show_last100(): {e}")
+            #self.text_edit.append(f"Error in running external cc(): {e}")
+
+    def show_last100(self):
+        # Aktion des Menüeintrags # aus externer Funktion
+        try:
+            self.central_widget.text_edit.append("Datetime: " + stringtimenow())
+            with redirect_stdout_ext(self.central_widget.text_edit):
+                veitzQueryToolFunctions.show_last100()
+        except Exception as e:
+            self.central_widget.text_edit.append(f"Error: maybe in running external show_last100(): {e}")
+            #self.text_edit.append(f"Error in running external cc(): {e}")
 
 
 
@@ -281,7 +323,7 @@ class MyMainWindow(QMainWindow):
         # Aktion des Menüeintrags # aus externer .py
         try:
             with redirect_stdout_ext(self.central_widget.text_edit):
-                veitzQueryToolFunctions.json_search()
+                veitzQueryToolFunctions.json_search2()
         except Exception as e:
             self.central_widget.text_edit.append(f"Error in running external cc(): {e}")
             #self.text_edit.append(f"Error in running external cc(): {e}")
