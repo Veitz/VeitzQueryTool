@@ -11,20 +11,6 @@ API DOC: *https://api.onetrading.com/fast/v1*
 REST API: *https://docs.onetrading.com/#fast-upgrade---*   
 .MD-File Syntax: *http://markdown-syntax.de/Syntax/Zeilenumbrueche/* 
 
-
-
-
-### StoppLoss:
-`StopLoss will be calculated on based BTC-Value.`
-
-new Functions:  
-`set_StopLoss (set a stopLoss order),   
-delete_openOrders (closed all open orders),  
-buy Order (takes the entire value),  
-sell Order (takes the entire value)`  
-Bei Änderung der JSON (duch BitPanda) muss die Variable "btcnow = j[2]['best_bid']" 
-in der Methode "def buy_trigger(self):" angepasst werden (alle JSON kontrollieren)!
-
 ### Requirements:
 sudo apt update && upgrade   
 sudo apt install python3-pyqt5   
