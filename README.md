@@ -9,7 +9,6 @@ Linklist:
 Ontrading.com doc: *https://docs.onetrading.com/*  
 API DOC: *https://api.onetrading.com/fast/v1*   
 REST API: *https://docs.onetrading.com/#fast-upgrade---*   
-.MD-File Syntax: *http://markdown-syntax.de/Syntax/Zeilenumbrueche/* 
 
 ### Requirements:
 sudo apt update && upgrade   
