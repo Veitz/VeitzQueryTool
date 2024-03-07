@@ -1,3 +1,5 @@
+import tkinter.messagebox
+from PyQt5.QtWidgets import QApplication, QWidget, QMessageBox
 import sys
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QTextEdit, QMainWindow, QAction, QMenu, QMessageBox
@@ -348,3 +350,173 @@ def changelog():
             print(line)
         print("")
         print(">>>")
+
+
+def get_version():
+    config = configparser.ConfigParser()
+    config.read('CONFIG.INI')
+    vnr = str(config['VERSION']['versionnum'])
+    return vnr
+
+
+
+def hello():
+    print("HelloWorld!")
+
+
+
+def sell_trigger():
+    def btcnow():
+        """gibt den aktuellen btc marktpreis zurück, wird für die berechnung des btc amount im fiatwallet benötig"""
+        config = configparser.ConfigParser()
+        config.read('CONFIG.INI')
+        btcval = int(config['DEFAULT']['coinvalbtc'])
+        bpkey = str(config['DEFAULT']['apikey'])
+        headers = {
+            'Accept': 'application/json',
+            'Authorization': bpkey
+        }
+        r = requests.get('https://api.onetrading.com/fast/v1/market-ticker', params={
+            "instrument_code": "BTC_EUR"
+        }, headers=headers)
+        j = r.json()
+        btcnow = j[int(btcval)]['last_price']             # best bid btc
+        #print('BTC Value now : ', btcnow, '€')
+        return btcnow
+
+    def orderbook_snap_bid():
+        conn = http.client.HTTPSConnection("api.onetrading.com")
+        headers = {'Accept': "application/json"}
+        conn.request("GET", "/fast/v1/order-book/BTC_EUR", headers=headers)
+        res = conn.getresponse()
+
+        dat = res.read()
+        data = dat.decode("utf-8")
+        jdata = json.loads(data)
+        jsonbid = jdata['bids'][0]['price']
+        return jsonbid
+
+    print(" - BTC INFOS CURRENTLY - ")
+    print("btc price: ", btcnow(), "€")
+    print("order-book price: ", orderbook_snap_bid(), "€")
+    print(" - ASK Order - ")
+    """gibt den btc amount des wallets wieder, wird zum verkauf benötigt"""
+    config = configparser.ConfigParser()
+    config.read('CONFIG.INI')
+    bpkey = str(config['DEFAULT']['apikey'])
+    headers = {
+        'Accept': 'application/json',
+        'Authorization': bpkey
+    }
+    r = requests.get('https://api.onetrading.com/fast/v1/account/balances', params={
+    }, headers=headers)
+    # print(r.json())
+    j = r.json()
+    e = j['balances']
+    a = e[3]['available']
+    b = float(a)
+    av = "%.5f" % (b - b % 0.00001)
+    print("your absolute Value: ", a)
+    print("sell amount of BTC wallet: ", av)
+    """post ask order on marketprice"""
+    config = configparser.ConfigParser()
+    config.read('CONFIG.INI')
+    bpkey = str(config['DEFAULT']['apikey'])
+    headers = {
+        'Accept': 'application/json',
+        'Authorization': bpkey
+    }
+    r = requests.post('https://api.onetrading.com/fast/v1/account/orders',
+                      json={"instrument_code": "BTC_EUR","type": "LIMIT" , "side": "SELL", "amount": str(av), "price": str(orderbook_snap_bid()), "time_in_force": "IMMEDIATE_OR_CANCELLED"},             # , "time_in_force": "GOOD_TILL_CANCELLED"
+                      headers=headers)
+    print("used order-book price: ", orderbook_snap_bid(), "€")
+    print(" - carry out / err msg - ")
+    print(r.json())
+    data = json.dumps(r.json())
+    with open("_selllog.json", "a") as f:
+        f.write(stringtimenow() + " - " + data + '\r\n')
+    print("")
+    print(">>>")
+    #print(1 * 40000 / 100)  # 1% von 40000
+
+
+
+
+def buy_trigger():
+    def btcnow():
+        """gibt den aktuellen btc marktpreis zurück, wird für die berechnung des btc amount im fiatwallet benötig"""
+        config = configparser.ConfigParser()
+        config.read('CONFIG.INI')
+        btcval = int(config['DEFAULT']['coinvalbtc'])
+        bpkey = str(config['DEFAULT']['apikey'])
+        headers = {
+            'Accept': 'application/json',
+            'Authorization': bpkey
+        }
+        r = requests.get('https://api.onetrading.com/fast/v1/market-ticker', params={
+            "instrument_code": "BTC_EUR"
+        }, headers=headers)
+        j = r.json()
+        btcnow = j[int(btcval)]['last_price']             # best bid btc
+        #print('BTC Value now : ', btcnow, '€')
+        return btcnow
+
+    def orderbook_snap_ask():
+        conn = http.client.HTTPSConnection("api.onetrading.com")
+        headers = {'Accept': "application/json"}
+        conn.request("GET", "/fast/v1/order-book/BTC_EUR", headers=headers)
+        res = conn.getresponse()
+
+        dat = res.read()
+        data = dat.decode("utf-8")
+        jdata = json.loads(data)
+        jsonask = jdata['asks'][0]['price']
+        return jsonask
+
+    print(" - BTC INFOS CURRENTLY - ")
+    print("btc price: ", btcnow(), "€")
+    print("order-book price: ", orderbook_snap_ask(), "€")
+    print(" - BID Order - ")
+    print('BTC Value now : ', btcnow(), '€')
+    # print("order-book price: ", orderbook_snap_ask(), "€")    # wird unten im verwendeten order-book-price angezeigt
+    """gibt die FIAT Wallet-Balance aus"""
+    config = configparser.ConfigParser()
+    config.read('CONFIG.INI')
+    bpkey = str(config['DEFAULT']['apikey'])
+    headers = {
+        'Accept': 'application/json',
+        'Authorization': bpkey
+    }
+    r = requests.get('https://api.onetrading.com/fast/v1/account/balances', params={
+    }, headers=headers)
+    # print(r.json())
+    j = r.json()
+    e = j['balances']
+    try:
+        fiatval2 = e[2]['available']
+        #fiatval3 = round(float(fiatval2), 2)
+        print('my Fiatwallet amount : ', fiatval2, '€')
+    except KeyError:
+        print("ERROR: in api_getbalance.py or JSON doesn't exist")
+    bbv = floor(float(fiatval2)) / float(orderbook_snap_ask())  # ürsprüngliche Berechnung aus btcnow()
+    bbvr = round(bbv, 5) - float(0.001)
+    print('your BTC buy amount:', bbvr)
+    ### kaufe BTC zum Limitprice ###
+    config = configparser.ConfigParser()
+    config.read('CONFIG.INI')
+    bpkey = str(config['DEFAULT']['apikey'])
+    headers = {
+        'Accept': 'application/json',
+        'Authorization': bpkey
+    }
+    r = requests.post('https://api.onetrading.com/fast/v1/account/orders',
+                      json={"instrument_code": "BTC_EUR", "type": "LIMIT", "side": "BUY", "amount": str(bbvr), "price": str(orderbook_snap_ask()), "time_in_force": "IMMEDIATE_OR_CANCELLED"},  # , "time_in_force": "GOOD_TILL_CANCELLED"
+                      headers=headers)
+    print("used order-book price: ", orderbook_snap_ask(), "€")
+    print(" - carry out / err msg - ")
+    print(r.json())
+    data = json.dumps(r.json())
+    with open("_buylog.json", "a") as f:
+        f.write(stringtimenow() + " - " + data + '\r\n')
+    print("")
+    print(">>>")
