@@ -15,7 +15,7 @@ sudo apt update && upgrade
 sudo apt install python3-pyqt5   
 sudo apt install python3-tk   
 pip3 install --upgrade pip   
-pip3 install pyqt5
+pip3 install pyqt5    
 pip3 install requests   
 pip3 install datetime   
 pip3 install configparser    
