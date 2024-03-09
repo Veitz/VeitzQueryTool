@@ -3,7 +3,7 @@
 
 This tool is a GUI to use the ontrading.com exchange. Create a personal API key on the trading platform, enter the key in the config file and you can trade using the tool.     
 
-![image description]([https://i.ibb.co/1nnM3G6/lizenzverwaltung.png](https://ibb.co/DWmhVB6))
+![image description]([https://i.ibb.co/1nnM3G6/lizenzverwaltung.png](https://ibb.co/DWmhVB6)
    
 ## VeitzQueryTool is a Querytool for the crypto Exchange onetrading.com
 
