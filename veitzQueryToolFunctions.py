@@ -1,8 +1,3 @@
-import tkinter.messagebox
-from PyQt5.QtWidgets import QApplication, QWidget, QMessageBox
-import sys
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QTextEdit, QMainWindow, QAction, QMenu, QMessageBox
 from datetime import datetime
 import json
 import os
@@ -16,7 +11,8 @@ from pathlib import Path
 import http.client          # only for delete_stopp_loss_order or closing all orders atm
 import pprint
 
-
+def hello():
+    print("HelloWorld!")
 
 def orderbook_btc_snap_ask():
     conn = http.client.HTTPSConnection("api.onetrading.com")
@@ -71,10 +67,8 @@ def api_status():
     print("market state BTC-EUR:", jsonelement, "json-value:", btcval)
     jsonelement = jdata[ethval]['state']
     print("market state ETH-EUR:", jsonelement, "json-value:", ethval, "\n")
-    #print("Infos: https://api.onetrading.com/fast/v1 - REST API & \n https://docs.onetrading.com/#fast-upgrade--- \n")
     print("")
     print(">>>")
-#api_status()
 
 
 def json_search():
@@ -122,10 +116,11 @@ def json_search():
     os.remove("jsontmp.csv")
     print("")
     print(">>>")
-#json_search()
+json_search()
+
 
 def json_search2():
-    """Ausgabe aller Wertepaare und deren Information."""
+    """Output of all value pairs and their information."""
     headers = {
         'Accept': 'application/json'
     }
@@ -143,6 +138,8 @@ def json_search2():
         data = json.loads(f.read())
     # create dataframe
     pprint.pprint(data)
+     # clean-up
+    os.remove("jsontmp.json")
     print("")
     print(">>>")
 
@@ -168,7 +165,6 @@ def readconf():
             print(line)
         print("")
         print(">>>")
-#print(readconf())
 
 
 def fearandgreed():
@@ -187,7 +183,7 @@ def fearandgreed():
 
 
 def ethinfonow():
-    """gibt den aktuellen btc marktpreis Informationen zurück."""
+    """returns the current market price information."""
     config = configparser.ConfigParser()
     config.read('CONFIG.INI')
     ethval = int(config['DEFAULT']['coinvaleth'])
@@ -216,7 +212,7 @@ def ethinfonow():
 
 
 def btcinfonow():
-    """gibt den aktuellen btc marktpreis Informationen zurück."""
+    """returns the current btc market price information."""
     config = configparser.ConfigParser()
     config.read('CONFIG.INI')
     btcval = int(config['DEFAULT']['coinvalbtc'])
@@ -252,7 +248,7 @@ def btcinfonow():
 
 
 def show_last100():
-    """zeige die letzten 100 Trades"""
+    """show last 100 trades"""
     config = configparser.ConfigParser()
     config.read('CONFIG.INI')
     bpkey = str(config['DEFAULT']['apikey'])
@@ -277,13 +273,12 @@ def show_last100():
     print("cleaning up tempfiles done!")
     print("")
     print(">>>")
-#show_last100_trigger()
 
 
 def walletinfo():
-    """gibt die Wallet-Balance aus"""
+    """get wallet-balance"""
     def btcBestBid():
-        """gibt den aktuellen btc marktpreis zurück. wird für die berechnung des btc amount im fiatwallet benötig"""
+        """returns the current btc market price. is required for the calculation of the btc amount in the fiat wallet"""
         headers = {
             'Accept': 'application/json'
         }
@@ -294,10 +289,10 @@ def walletinfo():
         config = configparser.ConfigParser()
         config.read('CONFIG.INI')
         btcval = int(config['DEFAULT']['coinvalbtc'])
-        return j[int(btcval)]['last_price']               # best bid btc, zur Berechnung
+        return j[int(btcval)]['last_price']               # best bid btc, for calculation
 
     def ethBestBid():
-        """gibt den aktuellen eth marktpreis zurück. wird für die berechnung des eth amount im fiatwallet benötig"""
+        """returns the current eth market price. is required for the calculation of the btc amount in the fiat wallet"""
         headers = {
             'Accept': 'application/json'
         }
@@ -308,7 +303,7 @@ def walletinfo():
         config = configparser.ConfigParser()
         config.read('CONFIG.INI')
         ethval = int(config['DEFAULT']['coinvaleth'])
-        return j[int(ethval)]['last_price']               # best bid eth, zur Berechnung
+        return j[int(ethval)]['last_price']               # best bid eth, for calculation
 
     config = configparser.ConfigParser()
     config.read('CONFIG.INI')
@@ -337,7 +332,7 @@ def walletinfo():
         #print("available:     ", e[0]['available'])
         #print("currency_code: ", e[4]['currency_code'])
         #print("available:     ", e[4]['available'])
-        print('HINWEIS: Currencies mit gesetztem Stop-Loss sind LOCKED und werden daher nicht angezeigt!')
+        #print('HINWEIS: Currencies mit gesetztem Stop-Loss sind LOCKED und werden daher nicht angezeigt!')
     except KeyError:
         print("ERROR: in api_getbalance.py or JSON doesn't exist")
     print("")
@@ -359,15 +354,9 @@ def get_version():
     return vnr
 
 
-
-def hello():
-    print("HelloWorld!")
-
-
-
 def sell_trigger():
     def btcnow():
-        """gibt den aktuellen btc marktpreis zurück, wird für die berechnung des btc amount im fiatwallet benötig"""
+        """returns the current btc market price. is required for the calculation of the btc amount in the fiat wallet"""
         config = configparser.ConfigParser()
         config.read('CONFIG.INI')
         btcval = int(config['DEFAULT']['coinvalbtc'])
@@ -435,6 +424,7 @@ def sell_trigger():
     data = json.dumps(r.json())
     with open("_selllog.json", "a") as f:
         f.write(stringtimenow() + " - " + data + '\r\n')
+        #f.write(data + '\r\n')
     print("")
     print(">>>")
     #print(1 * 40000 / 100)  # 1% von 40000
@@ -444,7 +434,7 @@ def sell_trigger():
 
 def buy_trigger():
     def btcnow():
-        """gibt den aktuellen btc marktpreis zurück, wird für die berechnung des btc amount im fiatwallet benötig"""
+        """returns the current btc market price. is required for the calculation of the btc amount in the fiat wallet"""
         config = configparser.ConfigParser()
         config.read('CONFIG.INI')
         btcval = int(config['DEFAULT']['coinvalbtc'])
@@ -478,7 +468,7 @@ def buy_trigger():
     print("order-book price: ", orderbook_snap_ask(), "€")
     print(" - BID Order - ")
     print('BTC Value now : ', btcnow(), '€')
-    # print("order-book price: ", orderbook_snap_ask(), "€")    # wird unten im verwendeten order-book-price angezeigt
+    # print("order-book price: ", orderbook_snap_ask(), "€")    # is displayed at the bottom of the order-book-price used
     """gibt die FIAT Wallet-Balance aus"""
     config = configparser.ConfigParser()
     config.read('CONFIG.INI')
@@ -498,10 +488,10 @@ def buy_trigger():
         print('my Fiatwallet amount : ', fiatval2, '€')
     except KeyError:
         print("ERROR: in api_getbalance.py or JSON doesn't exist")
-    bbv = floor(float(fiatval2)) / float(orderbook_snap_ask())  # ürsprüngliche Berechnung aus btcnow()
+    bbv = floor(float(fiatval2)) / float(orderbook_snap_ask())  # Original calculation from btcnow()
     bbvr = round(bbv, 5) - float(0.001)
     print('your BTC buy amount:', bbvr)
-    ### kaufe BTC zum Limitprice ###
+    ### buy BTC at Limitprice ###
     config = configparser.ConfigParser()
     config.read('CONFIG.INI')
     bpkey = str(config['DEFAULT']['apikey'])
@@ -518,5 +508,6 @@ def buy_trigger():
     data = json.dumps(r.json())
     with open("_buylog.json", "a") as f:
         f.write(stringtimenow() + " - " + data + '\r\n')
+        #f.write(data + '\r\n')
     print("")
     print(">>>")
