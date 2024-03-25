@@ -27,3 +27,7 @@ pip3 install pandas
 pip3 install pathlib   
 pip3 install path   
 pip3 install pyfiglet
+
+set the variable    
+`apikey = Bearer XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX`   
+in the CONFIG.INI file with your configured API key from ontrading.com   
