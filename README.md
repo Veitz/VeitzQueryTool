@@ -31,3 +31,6 @@ pip3 install pyfiglet
 set the variable    
 `apikey = Bearer XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX`   
 in the CONFIG.INI file with your configured API key from ontrading.com   
+
+run:
+`python3 veitzQueryToolPyQT5.py`
