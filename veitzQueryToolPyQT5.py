@@ -9,7 +9,9 @@ from io import StringIO
 import contextlib
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox
 
-
+from realTimeGraph import MainWindow
+from realTimeCacheData import BTCInfoApp
+from PyQt5.QtCore import QProcess
 
 
 class MyWidget(QWidget):
@@ -23,7 +25,7 @@ class MyWidget(QWidget):
 
         ### Pyfiglet-Text show as QLabel anzeigen
         #figlet_text = pyfiglet.figlet_format("          VeitzQueryTool")
-        #figlet_text = "          VeitzQueryTool"
+        ###figlet_text = "          VeitzQueryTool"
         #figlet_label = QLabel(figlet_text, self)
         #figlet_label.setStyleSheet("font-family: monospace; font-size: 15px; text-align: center;")
         #layout.addWidget(figlet_label)
@@ -144,6 +146,12 @@ class MyMainWindow(QMainWindow):
         self.central_widget = MyWidget()
         self.setCentralWidget(self.central_widget)
 
+        # QProcess-Instanzen für externe Programme
+        self.process_gui1 = None
+        self.process_gui2 = None
+        self.process_gui3 = None
+        self.process_gui4 = None
+
         self.initMenu()
 
         self.setGeometry(500, 300, 850, 768) # def setGeometry (x, y, w, h)   # https://doc.qt.io/qtforpython-5/PySide2/QtWidgets/QWidget.html
@@ -201,6 +209,21 @@ class MyMainWindow(QMainWindow):
         openordersAction.triggered.connect(self.open_orders)
         fileMenu.addAction(openordersAction)
 
+
+        fileMenu = menubar.addMenu('Real-Time Tools')                           ##########################
+        configinfoAction = QAction('get realTime BTC-Value - onetrading', self) ##########################
+        configinfoAction.triggered.connect(self.get_realtime_btc_value)         ##########################
+        fileMenu.addAction(configinfoAction)                                    ###### RealTimeTools #####
+        showconfigAction = QAction('show realTimeGraph - onetrading', self)     ##########################
+        showconfigAction.triggered.connect(self.show_real_time_graph)           ##########################
+        fileMenu.addAction(showconfigAction)                                    ##########################
+        fileMenu.addSeparator()
+        configinfoAction = QAction('get realTime BTC-Value - binance', self)    ##########################
+        configinfoAction.triggered.connect(self.get_realtime_btc_value_binance) ##########################
+        fileMenu.addAction(configinfoAction)                                    ###### RealTimeTools #####
+        showconfigAction = QAction('show realTimeGraph - binance', self)        ##########################
+        showconfigAction.triggered.connect(self.show_real_time_graph_binance)   ##########################
+        fileMenu.addAction(showconfigAction)
 
 
         fileMenu = menubar.addMenu('Settings')
@@ -319,6 +342,66 @@ class MyMainWindow(QMainWindow):
 
 
 
+
+    ### RealTime Tools ###
+
+    def get_realtime_btc_value(self):
+        """Externe GUI 1 starten (BTC Info)"""
+        try:
+            if self.process_gui1 is None or self.process_gui1.state() == QProcess.NotRunning:
+                self.process_gui1 = QProcess(self)
+                self.process_gui1.finished.connect(lambda: print("BTC Info GUI onetraiding beendet"))
+                self.process_gui1.start("python", ["realTimeCacheData.py"])  # Pfad und Dateiname anpassen
+            else:
+                QMessageBox.warning(self, "Warnung", "BTC Info GUI onetraiding läuft bereits!")
+        except Exception as e:
+            QMessageBox.critical(self, "Fehler", f"Fehler beim Starten der BTC Info GUI onetraiding: {e}")
+
+    def show_real_time_graph(self):
+        """Externe GUI 2 starten (BTC Graph)"""
+        try:
+            if self.process_gui2 is None or self.process_gui2.state() == QProcess.NotRunning:
+                self.process_gui2 = QProcess(self)
+                self.process_gui2.finished.connect(lambda: print("BTC Graph GUI onetraiding beendet"))
+                self.process_gui2.start("python", ["realTimeGraph.py"])  # Pfad und Dateiname anpassen
+            else:
+                QMessageBox.warning(self, "Warnung", "BTC Graph GUI ontraiding läuft bereits!")
+        except Exception as e:
+            QMessageBox.critical(self, "Fehler", f"Fehler beim Starten der BTC Graph GUI onetraiding: {e}")
+
+
+
+    def get_realtime_btc_value_binance(self):
+        """Externe GUI binance 1 starten (BTC Info)"""
+        try:
+            if self.process_gui3 is None or self.process_gui3.state() == QProcess.NotRunning:
+                self.process_gui3 = QProcess(self)
+                self.process_gui3.finished.connect(lambda: print("BTC Info GUI binance beendet"))
+                self.process_gui3.start("python", ["realTimeCacheDataBinance.py"])  # Pfad und Dateiname anpassen
+            else:
+                QMessageBox.warning(self, "Warnung", "BTC Info GUI biance läuft bereits!")
+        except Exception as e:
+            QMessageBox.critical(self, "Fehler", f"Fehler beim Starten der BTC Info GUI binance: {e}")
+
+    def show_real_time_graph_binance(self):
+        """Externe GUI biannce 2 starten (BTC Graph)"""
+        try:
+            if self.process_gui4 is None or self.process_gui4.state() == QProcess.NotRunning:
+                self.process_gui4 = QProcess(self)
+                self.process_gui4.finished.connect(lambda: print("BTC Graph GUI binance beendet"))
+                self.process_gui4.start("python", ["realTimeGraphBinance.py"])  # Pfad und Dateiname anpassen
+            else:
+                QMessageBox.warning(self, "Warnung", "BTC Graph GUI biance läuft bereits!")
+        except Exception as e:
+            QMessageBox.critical(self, "Fehler", f"Fehler beim Starten der BTC Graph GUI binance: {e}")
+
+
+
+
+
+
+    ### Settings ###
+
     def config_info(self):
         # Aktion des Menüeintrags # aus externer .py
         try:
@@ -341,6 +424,7 @@ class MyMainWindow(QMainWindow):
 
 
 
+    ### About ###
 
     def data_viewer(self):
         # Aktion des Menüeintrags # aus externer .py
