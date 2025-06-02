@@ -33,4 +33,6 @@ set the variable
 in the CONFIG.INI file with your configured API key from ontrading.com   
 
 run:
-`python3 veitzQueryToolPyQT5.py`
+`python3 veitzQueryToolPyQT5.py`  
+
+## !!! you need to customize the INI file to work !!!  
