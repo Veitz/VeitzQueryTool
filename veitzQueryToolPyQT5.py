@@ -228,10 +228,10 @@ class MyMainWindow(QMainWindow):
 
         fileMenu = menubar.addMenu('Settings')
         configinfoAction = QAction('config Info/Update', self)
-        configinfoAction.triggered.connect(self.config_info)  # Hier wird die Methode test aufgerufen
+        configinfoAction.triggered.connect(self.config_info)  
         fileMenu.addAction(configinfoAction)
         showconfigAction = QAction('show config.ini', self)
-        showconfigAction.triggered.connect(self.show_config)  # Hier wird die Methode test aufgerufen
+        showconfigAction.triggered.connect(self.show_config)  
         fileMenu.addAction(showconfigAction)
 
 
@@ -351,9 +351,7 @@ class MyMainWindow(QMainWindow):
             if self.process_gui1 is None or self.process_gui1.state() == QProcess.NotRunning:
                 self.process_gui1 = QProcess(self)
                 self.process_gui1.finished.connect(lambda: print("BTC Info GUI onetraiding beendet"))
-                # import sys # wird für sys-executable benötigt
-                # self.process_gui1.start(sys.executable, ["realTimeCacheData.py"]) # Pfad und Dateiname anpassen
-                self.process_gui1.start("python3", ["realTimeCacheData.py"])  # das nicht da der python2 interpreter verwedet wird, mit sys.executable wird der des systems verwendet, hier die 3 hinter schreiben
+                self.process_gui1.start("python3", ["realTimeCacheData.py"])  
             else:
                 QMessageBox.warning(self, "Warnung", "BTC Info GUI onetraiding läuft bereits!")
         except Exception as e:
@@ -365,7 +363,7 @@ class MyMainWindow(QMainWindow):
             if self.process_gui2 is None or self.process_gui2.state() == QProcess.NotRunning:
                 self.process_gui2 = QProcess(self)
                 self.process_gui2.finished.connect(lambda: print("BTC Graph GUI onetraiding beendet"))
-                self.process_gui2.start("python3", ["realTimeGraph.py"])  # Pfad und Dateiname anpassen
+                self.process_gui2.start("python3", ["realTimeGraph.py"])  
             else:
                 QMessageBox.warning(self, "Warnung", "BTC Graph GUI ontraiding läuft bereits!")
         except Exception as e:
@@ -379,7 +377,7 @@ class MyMainWindow(QMainWindow):
             if self.process_gui3 is None or self.process_gui3.state() == QProcess.NotRunning:
                 self.process_gui3 = QProcess(self)
                 self.process_gui3.finished.connect(lambda: print("BTC Info GUI binance beendet"))
-                self.process_gui3.start("python3", ["realTimeCacheDataBinance.py"])  # Pfad und Dateiname anpassen
+                self.process_gui3.start("python3", ["realTimeCacheDataBinance.py"])  
             else:
                 QMessageBox.warning(self, "Warnung", "BTC Info GUI binance läuft bereits!")
         except Exception as e:
@@ -391,7 +389,7 @@ class MyMainWindow(QMainWindow):
             if self.process_gui4 is None or self.process_gui4.state() == QProcess.NotRunning:
                 self.process_gui4 = QProcess(self)
                 self.process_gui4.finished.connect(lambda: print("BTC Graph GUI binance beendet"))
-                self.process_gui4.start("python3", ["realTimeGraphBinance.py"])  # Pfad und Dateiname anpassen
+                self.process_gui4.start("python3", ["realTimeGraphBinance.py"])  
             else:
                 QMessageBox.warning(self, "Warnung", "BTC Graph GUI binance läuft bereits!")
         except Exception as e:
