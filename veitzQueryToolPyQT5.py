@@ -23,12 +23,12 @@ class MyWidget(QWidget):
     def initUI(self):
         layout = QVBoxLayout()
 
-        ### Pyfiglet-Text show as QLabel anzeigen
-        #figlet_text = pyfiglet.figlet_format("          VeitzQueryTool")
-        ###figlet_text = "          VeitzQueryTool"
-        #figlet_label = QLabel(figlet_text, self)
-        #figlet_label.setStyleSheet("font-family: monospace; font-size: 15px; text-align: center;")
-        #layout.addWidget(figlet_label)
+        ### Pyfiglet-Text show as QLabel anzeigen ###
+        figlet_text = pyfiglet.figlet_format("          VeitzQueryTool")
+        #figlet_text = "          VeitzQueryTool"
+        figlet_label = QLabel(figlet_text, self)
+        figlet_label.setStyleSheet("font-family: monospace; font-size: 15px; text-align: center;")
+        layout.addWidget(figlet_label)
 
         # Text_Edit
         self.text_edit = QTextEdit(self)
@@ -351,7 +351,9 @@ class MyMainWindow(QMainWindow):
             if self.process_gui1 is None or self.process_gui1.state() == QProcess.NotRunning:
                 self.process_gui1 = QProcess(self)
                 self.process_gui1.finished.connect(lambda: print("BTC Info GUI onetraiding beendet"))
-                self.process_gui1.start("python", ["realTimeCacheData.py"])  # Pfad und Dateiname anpassen
+                # import sys # wird für sys-executable benötigt
+                # self.process_gui1.start(sys.executable, ["realTimeCacheData.py"]) # Pfad und Dateiname anpassen
+                self.process_gui1.start("python3", ["realTimeCacheData.py"])  # das nicht da der python2 interpreter verwedet wird, mit sys.executable wird der des systems verwendet, hier die 3 hinter schreiben
             else:
                 QMessageBox.warning(self, "Warnung", "BTC Info GUI onetraiding läuft bereits!")
         except Exception as e:
@@ -363,7 +365,7 @@ class MyMainWindow(QMainWindow):
             if self.process_gui2 is None or self.process_gui2.state() == QProcess.NotRunning:
                 self.process_gui2 = QProcess(self)
                 self.process_gui2.finished.connect(lambda: print("BTC Graph GUI onetraiding beendet"))
-                self.process_gui2.start("python", ["realTimeGraph.py"])  # Pfad und Dateiname anpassen
+                self.process_gui2.start("python3", ["realTimeGraph.py"])  # Pfad und Dateiname anpassen
             else:
                 QMessageBox.warning(self, "Warnung", "BTC Graph GUI ontraiding läuft bereits!")
         except Exception as e:
@@ -377,21 +379,21 @@ class MyMainWindow(QMainWindow):
             if self.process_gui3 is None or self.process_gui3.state() == QProcess.NotRunning:
                 self.process_gui3 = QProcess(self)
                 self.process_gui3.finished.connect(lambda: print("BTC Info GUI binance beendet"))
-                self.process_gui3.start("python", ["realTimeCacheDataBinance.py"])  # Pfad und Dateiname anpassen
+                self.process_gui3.start("python3", ["realTimeCacheDataBinance.py"])  # Pfad und Dateiname anpassen
             else:
-                QMessageBox.warning(self, "Warnung", "BTC Info GUI biance läuft bereits!")
+                QMessageBox.warning(self, "Warnung", "BTC Info GUI binance läuft bereits!")
         except Exception as e:
             QMessageBox.critical(self, "Fehler", f"Fehler beim Starten der BTC Info GUI binance: {e}")
 
     def show_real_time_graph_binance(self):
-        """Externe GUI biannce 2 starten (BTC Graph)"""
+        """Externe GUI binance 2 starten (BTC Graph)"""
         try:
             if self.process_gui4 is None or self.process_gui4.state() == QProcess.NotRunning:
                 self.process_gui4 = QProcess(self)
                 self.process_gui4.finished.connect(lambda: print("BTC Graph GUI binance beendet"))
-                self.process_gui4.start("python", ["realTimeGraphBinance.py"])  # Pfad und Dateiname anpassen
+                self.process_gui4.start("python3", ["realTimeGraphBinance.py"])  # Pfad und Dateiname anpassen
             else:
-                QMessageBox.warning(self, "Warnung", "BTC Graph GUI biance läuft bereits!")
+                QMessageBox.warning(self, "Warnung", "BTC Graph GUI binance läuft bereits!")
         except Exception as e:
             QMessageBox.critical(self, "Fehler", f"Fehler beim Starten der BTC Graph GUI binance: {e}")
 
