@@ -1,6 +1,10 @@
 
 # VeitzQueryTool - Changelog
 
+## CHANGELOG v2.2.1:
+- fix - get real time BTC-value ... onetrading / binance - now it works on all platforms
+- fix - real time graph ... onetrading / binance - now it works on all platforms
+
 ## CHANGELOG v2.2:
 - add trading tools - get real time BTC-value ... onetrading / binance
 - add trading tools - real time graph ... onetrading / binance
