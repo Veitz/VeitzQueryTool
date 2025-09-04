@@ -36,3 +36,6 @@ run:
 `python3 veitzQueryToolPyQT5.py`  
 
 ## !!! you need to customize the INI file to work !!!  
+
+
+ ![image description]([https://i.ibb.co/9NvFnKp/vqt.png](https://i.ibb.co/dsJDWmSM/Screenshot-2025-09-04-220811.png))     
