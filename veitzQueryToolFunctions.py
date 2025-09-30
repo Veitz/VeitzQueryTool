@@ -322,12 +322,12 @@ def walletinfo():
     #print(ethBestBid())
     try:
         print("- aktuelle Werte der Wallet's -")
-        print("currency_code: ", e[3]['currency_code'])
-        print("available:     ", e[3]['available'], "sind ", float(btcBestBid()) * float(e[3]['available']), "€" )
-        print("currency_code: ", e[1]['currency_code'])
-        print("available:     ", e[1]['available'], "sind ", float(ethBestBid()) * float(e[1]['available']), "€" )
-        print("currency_code: ", e[2]['currency_code'])
-        print("available:     ", e[2]['available'])
+        print("currency_code: ", e[0]['currency_code'])  # btc
+        print("available:     ", e[0]['available'], "sind ", float(e[0]['available']) * float(btcBestBid()), "€")
+        print("currency_code: ", e[1]['currency_code'])  # eth
+        print("available:     ", e[1]['available'], "sind ", float(e[1]['available']) * float(ethBestBid()), "€")
+        print("currency_code: ", e[3]['currency_code'])  # fiat
+        print("available:     ", e[3]['available'])
         #print("currency_code: ", e[0]['currency_code'])
         #print("available:     ", e[0]['available'])
         #print("currency_code: ", e[4]['currency_code'])
