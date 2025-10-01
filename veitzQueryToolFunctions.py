@@ -322,17 +322,17 @@ def walletinfo():
     #print(ethBestBid())
     try:
         print("- aktuelle Werte der Wallet's -")
-        print("currency_code: ", e[0]['currency_code'])  # btc
-        print("available:     ", e[0]['available'], "sind ", float(e[0]['available']) * float(btcBestBid()), "€")
-        print("currency_code: ", e[1]['currency_code'])  # eth
-        print("available:     ", e[1]['available'], "sind ", float(e[1]['available']) * float(ethBestBid()), "€")
-        print("currency_code: ", e[3]['currency_code'])  # fiat
-        print("available:     ", e[3]['available'])
-        #print("currency_code: ", e[0]['currency_code'])
-        #print("available:     ", e[0]['available'])
-        #print("currency_code: ", e[4]['currency_code'])
-        #print("available:     ", e[4]['available'])
-        #print('HINWEIS: Currencies mit gesetztem Stop-Loss sind LOCKED und werden daher nicht angezeigt!')
+        print("currency_code: ", e[0]['currency_code'])  # fiat
+        print("available:     ", e[0]['available'], " sind ", float(e[0]['available']) / float(btcBestBid()), "btc")
+        print("currency_code: ", e[1]['currency_code'])  # btc
+        print("available:     ", e[1]['available'], " sind ", float(btcBestBid()) * float(e[1]['available']), "€")
+        # print("currency_code: ", e[2]['currency_code'])  # eth
+        # print("available:     ", e[2]['available'])
+        # print("currency_code: ", e[0]['currency_code'])
+        # print("available:     ", e[0]['available'])
+        # print("currency_code: ", e[4]['currency_code'])
+        # print("available:     ", e[4]['available'])
+        # print('HINWEIS: Currencies mit gesetztem Stop-Loss sind LOCKED und werden daher nicht angezeigt!')
     except KeyError:
         print("ERROR: in api_getbalance.py or JSON doesn't exist")
     print("")
@@ -402,7 +402,7 @@ def sell_trigger():
     # print(r.json())
     j = r.json()
     e = j['balances']
-    a = e[3]['available']
+    a = e[1]['available']
     b = float(a)
     av = "%.5f" % (b - b % 0.00001)
     print("your absolute Value: ", a)
@@ -483,7 +483,7 @@ def buy_trigger():
     j = r.json()
     e = j['balances']
     try:
-        fiatval2 = e[2]['available']
+        fiatval2 = e[0]['available']
         #fiatval3 = round(float(fiatval2), 2)
         print('my Fiatwallet amount : ', fiatval2, '€')
     except KeyError:
