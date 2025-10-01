@@ -322,9 +322,9 @@ def walletinfo():
     #print(ethBestBid())
     try:
         print("- aktuelle Werte der Wallet's -")
-        print("currency_code: ", e[0]['currency_code'])  # fiat
+        print("currency_code: ", e[0]['currency_code'])  # fiat, muss auch in sell_trigger() angepasst werden!!
         print("available:     ", e[0]['available'], " sind ", float(e[0]['available']) / float(btcBestBid()), "btc")
-        print("currency_code: ", e[1]['currency_code'])  # btc
+        print("currency_code: ", e[1]['currency_code'])  # btc muss auch in buy_trigger() angepasst werden !!
         print("available:     ", e[1]['available'], " sind ", float(btcBestBid()) * float(e[1]['available']), "€")
         # print("currency_code: ", e[2]['currency_code'])  # eth
         # print("available:     ", e[2]['available'])
