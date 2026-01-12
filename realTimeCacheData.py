@@ -14,8 +14,8 @@ class BTCInfoApp(QtWidgets.QWidget):
 
     def initUI(self):
         # Fenster und Layout erstellen
-        self.setWindowTitle("BTC Info - Onetrading")
-        self.setGeometry(100, 100, 400, 300)
+        self.setWindowTitle("Onetrading - BTC Live Tracker")
+        self.setGeometry(100, 100, 500, 150)
 
         # Grid-Layout erstellen
         grid_layout = QtWidgets.QGridLayout()
