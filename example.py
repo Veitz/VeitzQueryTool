@@ -1,7 +1,7 @@
 import requests
 
 url = "https://api.onetrading.com/fast/v1/instruments?type=SPOT"
-#url = "https://api.onetrading.com/fast/v1/instruments?type=PERPETUAL_FUTURES"
+#url = "https://api.onetrading.com/fast/v1/instruments?type=PERP"
 
 payload={}
 headers = {
