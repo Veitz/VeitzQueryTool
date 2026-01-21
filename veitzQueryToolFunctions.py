@@ -107,8 +107,8 @@ def json_search():
     config = configparser.ConfigParser()
     config.read('CONFIG.INI')
     config['DEFAULT']['last_access'] = str(datetime.now())  # create
-    config['DEFAULT']['coinvalbtc'] = str(df[df['instrument_code'] == 'BTC_EUR'].index[0])  # create
-    config['DEFAULT']['coinvaleth'] = str(df[df['instrument_code'] == 'ETH_EUR'].index[0])  # create
+    config['DEFAULT']['coinvalbtc'] = str(df[df['instrument_code'] == 'BTC_USD'].index[0])  # create
+    config['DEFAULT']['coinvaleth'] = str(df[df['instrument_code'] == 'ETH_USD'].index[0])  # create
     with open('CONFIG.INI', 'w') as configfile:  # save
         config.write(configfile)
     # clean-up
