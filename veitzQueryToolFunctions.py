@@ -322,14 +322,14 @@ def walletinfo():
     #print(ethBestBid())
     try:
         print("- aktuelle Werte der Wallet's -")
-        print("currency_code: ", e[0]['currency_code'])  # fiat, muss auch in sell_trigger() angepasst werden!!
-        print("available:     ", e[0]['available'], " sind ", float(e[0]['available']) / float(btcBestBid()), "btc")
-        print("currency_code: ", e[1]['currency_code'])  # btc muss auch in buy_trigger() angepasst werden !!
-        print("available:     ", e[1]['available'], " sind ", float(btcBestBid()) * float(e[1]['available']), "€")
-        # print("currency_code: ", e[2]['currency_code'])  # eth
-        # print("available:     ", e[2]['available'])
-        # print("currency_code: ", e[0]['currency_code'])
-        # print("available:     ", e[0]['available'])
+        print("currency_code: ", e[0]['currency_code'])  # fiat, muss auch in sell_trigger() angepasst werden!!         # euro
+        print("available:     ", e[0]['available'], " sind ", float(e[0]['available']) / float(btcBestBid()), "btc")  # euro
+        print("currency_code: ", e[4]['currency_code'])  # btc muss auch in buy_trigger() angepasst werden !!           # btc
+        print("available:     ", e[4]['available'], " sind ", float(btcBestBid()) * float(e[4]['available']), "€")  # btc
+        print("currency_code: ", e[1]['currency_code'])  # eth
+        print("available:     ", e[1]['available'])  # eth
+        print("currency_code: ", e[3]['currency_code'])  # usdc
+        print("available:     ", e[3]['available'])  # usdc
         # print("currency_code: ", e[4]['currency_code'])
         # print("available:     ", e[4]['available'])
         # print('HINWEIS: Currencies mit gesetztem Stop-Loss sind LOCKED und werden daher nicht angezeigt!')
