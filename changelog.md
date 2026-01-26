@@ -22,3 +22,6 @@ REST API: *https://docs.onetrading.com/#fast-upgrade---*
 
 ### CHANGELOG v2.2.2:
 - API adjustments
+
+### CHANGELOG v2.2.2_dev:
+- fixed API changes (not final)

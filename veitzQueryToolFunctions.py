@@ -17,7 +17,7 @@ def hello():
 def orderbook_btc_snap_ask():
     conn = http.client.HTTPSConnection("api.onetrading.com")
     headers = {'Accept': "application/json"}
-    conn.request("GET", "/fast/v1/order-book/BTC_EUR", headers=headers)
+    conn.request("GET", "/fast/v1/order-book/BTC_USDC", headers=headers)
     res = conn.getresponse()
 
     dat = res.read()
@@ -30,7 +30,7 @@ def orderbook_btc_snap_ask():
 def orderbook_btc_snap_bid():
     conn = http.client.HTTPSConnection("api.onetrading.com")
     headers = {'Accept': "application/json"}
-    conn.request("GET", "/fast/v1/order-book/BTC_EUR", headers=headers)
+    conn.request("GET", "/fast/v1/order-book/BTC_USDC", headers=headers)
     res = conn.getresponse()
 
     dat = res.read()
@@ -77,7 +77,7 @@ def json_search():
         'Accept': 'application/json'
     }
     r = requests.get('https://api.onetrading.com/fast/v1/market-ticker', params={
-        "instrument_code": "BTC_EUR"
+        "instrument_code": "BTC_USDC"
     }, headers=headers)
     # j = r.json()
     #print("api request status:", r.status_code, r.reason, "\n") # status_code ist bei request und nur status bei http.client
@@ -102,13 +102,13 @@ def json_search():
     # save to csv
     df.to_csv('jsontmp.csv', index=False, encoding='utf-8')
     # number of row
-    # print(df[df['instrument_code'] == 'BTC_EUR'].index)
-    # print(df[df['instrument_code'] == 'BTC_EUR'].index[0])
+    # print(df[df['instrument_code'] == 'BTC_USDC'].index)
+    # print(df[df['instrument_code'] == 'BTC_USDC'].index[0])
     config = configparser.ConfigParser()
     config.read('CONFIG.INI')
     config['DEFAULT']['last_access'] = str(datetime.now())  # create
-    config['DEFAULT']['coinvalbtc'] = str(df[df['instrument_code'] == 'BTC_USD'].index[0])  # create
-    config['DEFAULT']['coinvaleth'] = str(df[df['instrument_code'] == 'ETH_USD'].index[0])  # create
+    config['DEFAULT']['coinvalbtc'] = str(df[df['instrument_code'] == 'BTC_USDC'].index[0])  # create
+    config['DEFAULT']['coinvaleth'] = str(df[df['instrument_code'] == 'ETH_USDC'].index[0])  # create
     with open('CONFIG.INI', 'w') as configfile:  # save
         config.write(configfile)
     # clean-up
@@ -125,7 +125,7 @@ def json_search2():
         'Accept': 'application/json'
     }
     r = requests.get('https://api.onetrading.com/fast/v1/market-ticker', params={
-        "instrument_code": "BTC_EUR"
+        "instrument_code": "BTC_USDC"
     }, headers=headers)
     data = json.dumps(r.json())
     # write json to file
@@ -191,7 +191,7 @@ def ethinfonow():
         'Accept': 'application/json'
     }
     r = requests.get('https://api.onetrading.com/fast/v1/market-ticker', params={
-        "instrument_code": "ETH_EUR"
+        "instrument_code": "ETH_USDC"
     }, headers=headers)
     j = r.json()
     #h = j[int(ethval)]['time']
@@ -220,7 +220,7 @@ def btcinfonow():
         'Accept': 'application/json'
     }
     r = requests.get('https://api.onetrading.com/fast/v1/market-ticker', params={
-        "instrument_code": "BTC_EUR"
+        "instrument_code": "BTC_USDC"
     }, headers=headers)
     j = r.json()
     #print(j)
@@ -283,7 +283,7 @@ def walletinfo():
             'Accept': 'application/json'
         }
         r = requests.get('https://api.onetrading.com/fast/v1/market-ticker', params={
-            "instrument_code": "BTC_EUR"
+            "instrument_code": "BTC_USDC"
         }, headers=headers)
         j = r.json()
         config = configparser.ConfigParser()
@@ -297,7 +297,7 @@ def walletinfo():
             'Accept': 'application/json'
         }
         r = requests.get('https://api.onetrading.com/fast/v1/market-ticker', params={
-            "instrument_code": "ETH_EUR"
+            "instrument_code": "ETH_USDC"
         }, headers=headers)
         j = r.json()
         config = configparser.ConfigParser()
@@ -366,7 +366,7 @@ def sell_trigger():
             'Authorization': bpkey
         }
         r = requests.get('https://api.onetrading.com/fast/v1/market-ticker', params={
-            "instrument_code": "BTC_EUR"
+            "instrument_code": "BTC_USDC"
         }, headers=headers)
         j = r.json()
         btcnow = j[int(btcval)]['last_price']             # best bid btc
@@ -376,7 +376,7 @@ def sell_trigger():
     def orderbook_snap_bid():
         conn = http.client.HTTPSConnection("api.onetrading.com")
         headers = {'Accept': "application/json"}
-        conn.request("GET", "/fast/v1/order-book/BTC_EUR", headers=headers)
+        conn.request("GET", "/fast/v1/order-book/BTC_USDC", headers=headers)
         res = conn.getresponse()
 
         dat = res.read()
@@ -416,7 +416,7 @@ def sell_trigger():
         'Authorization': bpkey
     }
     r = requests.post('https://api.onetrading.com/fast/v1/account/orders',
-                      json={"instrument_code": "BTC_EUR","type": "LIMIT" , "side": "SELL", "amount": str(av), "price": str(orderbook_snap_bid()), "time_in_force": "IMMEDIATE_OR_CANCELLED"},             # , "time_in_force": "GOOD_TILL_CANCELLED"
+                      json={"instrument_code": "BTC_USDC","type": "LIMIT" , "side": "SELL", "amount": str(av), "price": str(orderbook_snap_bid()), "time_in_force": "IMMEDIATE_OR_CANCELLED"},             # , "time_in_force": "GOOD_TILL_CANCELLED"
                       headers=headers)
     print("used order-book price: ", orderbook_snap_bid(), "€")
     print(" - carry out / err msg - ")
@@ -444,7 +444,7 @@ def buy_trigger():
             'Authorization': bpkey
         }
         r = requests.get('https://api.onetrading.com/fast/v1/market-ticker', params={
-            "instrument_code": "BTC_EUR"
+            "instrument_code": "BTC_USDC"
         }, headers=headers)
         j = r.json()
         btcnow = j[int(btcval)]['last_price']             # best bid btc
@@ -454,7 +454,7 @@ def buy_trigger():
     def orderbook_snap_ask():
         conn = http.client.HTTPSConnection("api.onetrading.com")
         headers = {'Accept': "application/json"}
-        conn.request("GET", "/fast/v1/order-book/BTC_EUR", headers=headers)
+        conn.request("GET", "/fast/v1/order-book/BTC_USDC", headers=headers)
         res = conn.getresponse()
 
         dat = res.read()
@@ -500,7 +500,7 @@ def buy_trigger():
         'Authorization': bpkey
     }
     r = requests.post('https://api.onetrading.com/fast/v1/account/orders',
-                      json={"instrument_code": "BTC_EUR", "type": "LIMIT", "side": "BUY", "amount": str(bbvr), "price": str(orderbook_snap_ask()), "time_in_force": "IMMEDIATE_OR_CANCELLED"},  # , "time_in_force": "GOOD_TILL_CANCELLED"
+                      json={"instrument_code": "BTC_USDC", "type": "LIMIT", "side": "BUY", "amount": str(bbvr), "price": str(orderbook_snap_ask()), "time_in_force": "IMMEDIATE_OR_CANCELLED"},  # , "time_in_force": "GOOD_TILL_CANCELLED"
                       headers=headers)
     print("used order-book price: ", orderbook_snap_ask(), "€")
     print(" - carry out / err msg - ")
