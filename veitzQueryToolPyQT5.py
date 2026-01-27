@@ -48,12 +48,12 @@ class MyWidget(QWidget):
 
         grid_layout = QGridLayout()
 
-        button1 = QPushButton('-> buy Bitcoin', self)
+        button1 = QPushButton('buy Bitcoin', self)
         button1.setStyleSheet("background-color: #bfe5ad;")
         button1.clicked.connect(self.button_btc_buy)
         grid_layout.addWidget(button1, 0, 0)
 
-        button2 = QPushButton('<- sell Bitcoin', self)
+        button2 = QPushButton('sell Bitcoin', self)
         button2.setStyleSheet("background-color: #f09292;")
         button2.clicked.connect(self.button_btc_sell)
         grid_layout.addWidget(button2, 0, 1)
