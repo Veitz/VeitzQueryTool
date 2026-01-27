@@ -109,6 +109,7 @@ def json_search():
     config['DEFAULT']['last_access'] = str(datetime.now())  # create
     config['DEFAULT']['coinvalbtc'] = str(df[df['instrument_code'] == 'BTC_USDC'].index[0])  # create
     config['DEFAULT']['coinvaleth'] = str(df[df['instrument_code'] == 'ETH_USDC'].index[0])  # create
+    config['DEFAULT']['coinvalusdc'] = str(df[df['instrument_code'] == 'USDC_EUR'].index[0])  # create
     with open('CONFIG.INI', 'w') as configfile:  # save
         config.write(configfile)
     # clean-up
@@ -149,9 +150,11 @@ def confcheck():
     config.read('CONFIG.INI')
     btcval = int(config['DEFAULT']['coinvalbtc'])
     ethval = int(config['DEFAULT']['coinvaleth'])
+    usdcval = int(config['DEFAULT']['coinvalusdc'])
     print('')
     print('use JSON-Value for BTC:', btcval)
     print('use JSON-Value for ETH:', ethval)
+    print('use JSON-Value for ETH:', usdcval)
     print('configuration was updated!')
     print("")
     print(">>>")
