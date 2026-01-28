@@ -292,7 +292,7 @@ def walletinfo():
         config = configparser.ConfigParser()
         config.read('CONFIG.INI')
         btcval = int(config['DEFAULT']['coinvalbtc'])
-        return j[int(btcval)]['last_price']               # best bid btc, for calculation
+        return j[int(btcval)]['last_price']               # best bid btc, for wallet-calculation
 
     def ethBestBid():
         """returns the current eth market price. is required for the calculation of the btc amount in the fiat wallet"""
@@ -306,7 +306,21 @@ def walletinfo():
         config = configparser.ConfigParser()
         config.read('CONFIG.INI')
         ethval = int(config['DEFAULT']['coinvaleth'])
-        return j[int(ethval)]['last_price']               # best bid eth, for calculation
+        return j[int(ethval)]['last_price']               # best bid eth, for wallet-calculation
+
+    def usdcBestBid():
+        """returns the current usdc market price. is required for the calculation of the btc amount in the fiat wallet"""
+        headers = {
+            'Accept': 'application/json'
+        }
+        r = requests.get('https://api.onetrading.com/fast/v1/market-ticker', params={
+            "instrument_code": "USDC_EUR"
+        }, headers=headers)
+        j = r.json()
+        config = configparser.ConfigParser()
+        config.read('CONFIG.INI')
+        usdcval = int(config['DEFAULT']['coinvalusdc'])
+        return j[int(usdcval)]['last_price']  # best bid usdc, for wallet-calculation
 
     config = configparser.ConfigParser()
     config.read('CONFIG.INI')
@@ -332,7 +346,7 @@ def walletinfo():
         print("currency_code: ", e[1]['currency_code'])  # eth
         print("available:     ", e[1]['available'])  # eth
         print("currency_code: ", e[3]['currency_code'])  # usdc
-        print("available:     ", e[3]['available'])  # usdc
+        print("available:     ", e[3]['available'], " sind ", float(usdcBestBid()) * float(e[3]['available']), "€")  # usdc
         # print("currency_code: ", e[4]['currency_code'])
         # print("available:     ", e[4]['available'])
         # print('HINWEIS: Currencies mit gesetztem Stop-Loss sind LOCKED und werden daher nicht angezeigt!')
