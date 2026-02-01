@@ -427,7 +427,7 @@ def sell_trigger():
         }, headers=headers)
         j = r.json()
         btcnow = j[int(btcval)]['last_price']             # best bid btc
-        #print('BTC Value now : ', btcnow, '€')
+        #print('BTC Value now : ', btcnow, '$')
         return btcnow
 
     def orderbook_snap_bid():
@@ -443,8 +443,8 @@ def sell_trigger():
         return jsonbid
 
     print(" - BTC INFOS CURRENTLY - ")
-    print("btc price: ", btcnow(), "€")
-    print("order-book price: ", orderbook_snap_bid(), "€")
+    print("btc price: ", btcnow(), "$")
+    print("order-book price: ", orderbook_snap_bid(), "$")
     print(" - ASK Order - ")
     """gibt den btc amount des wallets wieder, wird zum verkauf benötigt"""
     config = configparser.ConfigParser()
@@ -459,10 +459,10 @@ def sell_trigger():
     # print(r.json())
     j = r.json()
     e = j['balances']
-    a = e[1]['available']
+    a = e[4]['available']
     b = float(a)
     av = "%.5f" % (b - b % 0.00001)
-    print("your absolute Value: ", a)
+    print("your absolute BTC Value: ", a)
     print("sell amount of BTC wallet: ", av)
     """post ask order on marketprice"""
     config = configparser.ConfigParser()
@@ -475,7 +475,7 @@ def sell_trigger():
     r = requests.post('https://api.onetrading.com/fast/v1/account/orders',
                       json={"instrument_code": "BTC_USDC","type": "LIMIT" , "side": "SELL", "amount": str(av), "price": str(orderbook_snap_bid()), "time_in_force": "IMMEDIATE_OR_CANCELLED"},             # , "time_in_force": "GOOD_TILL_CANCELLED"
                       headers=headers)
-    print("used order-book price: ", orderbook_snap_bid(), "€")
+    print("used order-book price: ", orderbook_snap_bid(), "$")
     print(" - carry out / err msg - ")
     print(r.json())
     data = json.dumps(r.json())
@@ -505,7 +505,7 @@ def buy_trigger():
         }, headers=headers)
         j = r.json()
         btcnow = j[int(btcval)]['last_price']             # best bid btc
-        #print('BTC Value now : ', btcnow, '€')
+        #print('BTC Value now : ', btcnow, '$')
         return btcnow
 
     def orderbook_snap_ask():
@@ -521,10 +521,10 @@ def buy_trigger():
         return jsonask
 
     print(" - BTC INFOS CURRENTLY - ")
-    print("btc price: ", btcnow(), "€")
-    print("order-book price: ", orderbook_snap_ask(), "€")
+    print("btc price: ", btcnow(), "$")
+    print("order-book price: ", orderbook_snap_ask(), "$")
     print(" - BID Order - ")
-    print('BTC Value now : ', btcnow(), '€')
+    print('BTC Value now : ', btcnow(), '$')
     # print("order-book price: ", orderbook_snap_ask(), "€")    # is displayed at the bottom of the order-book-price used
     """gibt die FIAT Wallet-Balance aus"""
     config = configparser.ConfigParser()
@@ -540,13 +540,13 @@ def buy_trigger():
     j = r.json()
     e = j['balances']
     try:
-        fiatval2 = e[0]['available']
+        usdcval2 = e[3]['available']
         #fiatval3 = round(float(fiatval2), 2)
-        print('my Fiatwallet amount : ', fiatval2, '€')
+        print('my USDC amount : ', usdcval2)
     except KeyError:
         print("ERROR: in api_getbalance.py or JSON doesn't exist")
-    bbv = floor(float(fiatval2)) / float(orderbook_snap_ask())  # Original calculation from btcnow()
-    bbvr = round(bbv, 5) - float(0.001)
+    bbv = floor(float(usdcval2)) / float(orderbook_snap_ask())  # Original calculation from btcnow()
+    bbvr = round(bbv, 5) - float(0.0001)
     print('your BTC buy amount:', bbvr)
     ### buy BTC at Limitprice ###
     config = configparser.ConfigParser()
@@ -559,7 +559,7 @@ def buy_trigger():
     r = requests.post('https://api.onetrading.com/fast/v1/account/orders',
                       json={"instrument_code": "BTC_USDC", "type": "LIMIT", "side": "BUY", "amount": str(bbvr), "price": str(orderbook_snap_ask()), "time_in_force": "IMMEDIATE_OR_CANCELLED"},  # , "time_in_force": "GOOD_TILL_CANCELLED"
                       headers=headers)
-    print("used order-book price: ", orderbook_snap_ask(), "€")
+    print("used order-book price: ", orderbook_snap_ask(), "$")
     print(" - carry out / err msg - ")
     print(r.json())
     data = json.dumps(r.json())
