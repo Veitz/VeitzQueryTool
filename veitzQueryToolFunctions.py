@@ -53,6 +53,7 @@ def api_status():
     config.read('CONFIG.INI')
     btcval = int(config['DEFAULT']['coinvalbtc'])
     ethval = int(config['DEFAULT']['coinvaleth'])
+    usdcval = int(config['DEFAULT']['coinvalusdc'])
 
     conn = http.client.HTTPSConnection("api.onetrading.com")
     headers = {'Accept': "application/json"}
@@ -63,10 +64,21 @@ def api_status():
     dat = res.read()
     data = dat.decode("utf-8")
     jdata = json.loads(data)
-    jsonelement = jdata[btcval]['state']
-    print("market state BTC-EUR:", jsonelement, "json-value:", btcval)
-    jsonelement = jdata[ethval]['state']
-    print("market state ETH-EUR:", jsonelement, "json-value:", ethval, "\n")
+    try:
+        jsonelement = jdata[btcval]['state']
+        print("market state BTC-usdc:", jsonelement) #, "json-value:", ethval, "\n")
+    except Exception as e:
+        print("market state BTC-usdc:", type(e), e)
+    try:
+        jsonelement = jdata[usdcval]['state']
+        print("market state USDC-euro:", jsonelement) #, "json-value:", ethval, "\n")
+    except Exception as e:
+        print("market state USDC-euro:", type(e), e)
+    try:
+        jsonelement = jdata[ethval]['state']
+        print("market state ETH-usdc:", jsonelement, "\n") #, "json-value:", ethval, "\n")
+    except Exception as e:
+        print("market state ETH-usdc:", type(e), e)
     print("")
     print(">>>")
 
@@ -154,7 +166,7 @@ def confcheck():
     print('')
     print('use JSON-Value for BTC:', btcval)
     print('use JSON-Value for ETH:', ethval)
-    print('use JSON-Value for ETH:', usdcval)
+    print('use JSON-Value for USDC:', usdcval)
     print('configuration was updated!')
     print("")
     print(">>>")
@@ -198,7 +210,7 @@ def ethinfonow():
     }, headers=headers)
     j = r.json()
     #h = j[int(ethval)]['time']
-    print("- aktuelle ETH Informationen -")
+    print("- aktuelle ETH_usdc Informationen in $ -")
     print('Zeitstempel: ', str(datetime.now()))
     f = j[int(ethval)]['last_price']
     print('last_price: ', f)
@@ -209,6 +221,34 @@ def ethinfonow():
     n = j[int(ethval)]['high']
     print('high 24h  : ', n)
     m = j[int(ethval)]['low']
+    print('low 24h   : ', m)
+    print("")
+    print(">>>")
+
+def usdcinfonow():
+    """returns the current market price information."""
+    config = configparser.ConfigParser()
+    config.read('CONFIG.INI')
+    usdcval = int(config['DEFAULT']['coinvalusdc'])
+    headers = {
+        'Accept': 'application/json'
+    }
+    r = requests.get('https://api.onetrading.com/fast/v1/market-ticker', params={
+        "instrument_code": "USDC_EUR"
+    }, headers=headers)
+    j = r.json()
+    # h = j[int(usdcval)]['time']
+    print("- aktuelle USDC_eur Informationen in € -")
+    print('Zeitstempel: ', str(datetime.now()))
+    f = j[int(usdcval)]['last_price']
+    print('last_price: ', f)
+    # i = j[int(usdcval)]['best_bid']
+    # print('best_bid  : ', i)
+    # g = j[int(usdcval)]['best_ask']
+    # print('best_ask  : ', g)
+    n = j[int(usdcval)]['high']
+    print('high 24h  : ', n)
+    m = j[int(usdcval)]['low']
     print('low 24h   : ', m)
     print("")
     print(">>>")
@@ -228,7 +268,7 @@ def btcinfonow():
     j = r.json()
     #print(j)
     #h = j[int(btcval)]['time']
-    print("- aktuelle BTC Informationen in € -")
+    print("- aktuelle BTC_usdc Informationen in $ -")
     print('Zeitstempel: ', str(datetime.now()))
     f = j[int(btcval)]['last_price']
     print('last_price: ', f)

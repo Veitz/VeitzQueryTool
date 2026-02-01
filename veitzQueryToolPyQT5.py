@@ -57,17 +57,17 @@ class MyWidget(QWidget):
         button2.setStyleSheet("background-color: #f09292;")
         button2.clicked.connect(self.button_btc_sell)
         grid_layout.addWidget(button2, 0, 1)
-        """
-        button3 = QPushButton('-> buy Ethereum', self)
+
+        button3 = QPushButton('buy USDC', self)
         button3.setStyleSheet("background-color: #bfe5ad;")
-        button3.clicked.connect(self.button3Clicked)
+        button3.clicked.connect(self.button_usdc_buy)
         grid_layout.addWidget(button3, 1, 0)
 
-        button4 = QPushButton('<- sell Ethereum', self)
+        button4 = QPushButton('sell USDC', self)
         button4.setStyleSheet("background-color: #f09292;")
-        button4.clicked.connect(self.button4Clicked)
+        button4.clicked.connect(self.button_usdc_sell)
         grid_layout.addWidget(button4, 1, 1)
-        """
+
         # Exit Button hinzugefügt
         exitbutton = QPushButton('Exit', self)
         exitbutton.setStyleSheet("background-color: #f0f0f0; color: #333333; border: 1px solid #cccccc;")
@@ -117,12 +117,12 @@ class MyWidget(QWidget):
 
 
 
-    def button3Clicked(self):
-        QMessageBox.information(self, 'Information', 'buy Ethereum action:\n \n'
+    def button_usdc_buy(self):
+        QMessageBox.information(self, 'Information', 'buy USDC action:\n \n'
                                                      'in development...')
 
-    def button4Clicked(self):
-        QMessageBox.information(self, 'Information', 'sell Ethereum action:\n \n'
+    def button_usdc_sell(self):
+        QMessageBox.information(self, 'Information', 'sell USDC action:\n \n'
                                                      'in development...')
 
     def buttonExitClicked(self):
@@ -191,6 +191,9 @@ class MyMainWindow(QMainWindow):
         btcinfoAction = QAction('show BTC Value', self)
         btcinfoAction.triggered.connect(self.btc_info)
         fileMenu.addAction(btcinfoAction)
+        usdcinfoAction = QAction('show USDC Value', self)
+        usdcinfoAction.triggered.connect(self.usdc_info)
+        fileMenu.addAction(usdcinfoAction)
         ethinfoAction = QAction('show ETH Value', self)
         ethinfoAction.triggered.connect(self.eth_info)
         fileMenu.addAction(ethinfoAction)
@@ -284,6 +287,16 @@ class MyMainWindow(QMainWindow):
             self.central_widget.text_edit.append("Datetime: " + veitzQueryToolFunctions.stringtimenow())
             with redirect_stdout_ext(self.central_widget.text_edit):
                 veitzQueryToolFunctions.btcinfonow()
+        except Exception as e:
+            self.central_widget.text_edit.append(f"Error in running external cc(): {e}")
+            #self.text_edit.append(f"Error in running external cc(): {e}")
+
+    def usdc_info(self):
+        # Aktion des Menüeintrags # aus externer Funktion
+        try:
+            self.central_widget.text_edit.append("Datetime: " + veitzQueryToolFunctions.stringtimenow())
+            with redirect_stdout_ext(self.central_widget.text_edit):
+                veitzQueryToolFunctions.usdcinfonow()
         except Exception as e:
             self.central_widget.text_edit.append(f"Error in running external cc(): {e}")
             #self.text_edit.append(f"Error in running external cc(): {e}")
