@@ -48,22 +48,22 @@ class MyWidget(QWidget):
 
         grid_layout = QGridLayout()
 
-        button1 = QPushButton('buy Bitcoin', self)
+        button1 = QPushButton('buy Bitcoin (with usdc)', self)
         button1.setStyleSheet("background-color: #bfe5ad;")
         button1.clicked.connect(self.button_btc_buy)
         grid_layout.addWidget(button1, 0, 0)
 
-        button2 = QPushButton('sell Bitcoin', self)
+        button2 = QPushButton('sell Bitcoin (to usdc)', self)
         button2.setStyleSheet("background-color: #f09292;")
         button2.clicked.connect(self.button_btc_sell)
         grid_layout.addWidget(button2, 0, 1)
 
-        button3 = QPushButton('buy USDC', self)
+        button3 = QPushButton('buy USDC (with euro)', self)
         button3.setStyleSheet("background-color: #bfe5ad;")
         button3.clicked.connect(self.button_usdc_buy)
         grid_layout.addWidget(button3, 1, 0)
 
-        button4 = QPushButton('sell USDC', self)
+        button4 = QPushButton('sell USDC (to euro)', self)
         button4.setStyleSheet("background-color: #f09292;")
         button4.clicked.connect(self.button_usdc_sell)
         grid_layout.addWidget(button4, 1, 1)
