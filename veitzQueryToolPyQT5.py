@@ -84,7 +84,7 @@ class MyWidget(QWidget):
             self.text_edit.append("- buy BTC trigger - Datetime: " + veitzQueryToolFunctions.stringtimenow())
             with redirect_stdout_ext(self.text_edit):
                 reply = QMessageBox.question(self, 'Bestätigung',
-                                             "Möchten Sie BTC kaufen?",
+                                             "Möchten Sie BTC kaufen? (alle USDC zu BTC))",
                                              QMessageBox.Yes | QMessageBox.No,
                                              QMessageBox.No)
                 if reply == QMessageBox.Yes:
@@ -103,7 +103,7 @@ class MyWidget(QWidget):
             self.text_edit.append("- sell BTC trigger - Datetime: " + veitzQueryToolFunctions.stringtimenow())
             with redirect_stdout_ext(self.text_edit):
                 reply = QMessageBox.question(self, 'Bestätigung',
-                                             "Möchten Sie BTC verkaufen?",
+                                             "Möchten Sie BTC verkaufen? (alle BTC zu USDC)",
                                              QMessageBox.Yes | QMessageBox.No,
                                              QMessageBox.No)
                 if reply == QMessageBox.Yes:
@@ -118,11 +118,11 @@ class MyWidget(QWidget):
 
 
     def button_usdc_buy(self):
-        QMessageBox.information(self, 'Information', 'buy USDC action:\n \n'
+        QMessageBox.information(self, 'Information', 'kaufe USDC:\n \n'
                                                      'in development...')
 
     def button_usdc_sell(self):
-        QMessageBox.information(self, 'Information', 'sell USDC action:\n \n'
+        QMessageBox.information(self, 'Information', 'verkaufe USDC:\n \n'
                                                      'in development...')
 
     def buttonExitClicked(self):
