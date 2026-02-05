@@ -568,3 +568,79 @@ def buy_trigger():
         #f.write(data + '\r\n')
     print("")
     print(">>>")
+
+
+
+
+
+
+def sell_trigger_usdc():
+    def usdcnow():
+        """returns the current usdc market price. is required for the calculation of the usdc amount in the fiat wallet"""
+        headers = {
+            'Accept': 'application/json'
+        }
+        r = requests.get('https://api.onetrading.com/fast/v1/market-ticker', params={
+            "instrument_code": "USDC_EUR"
+        }, headers=headers)
+        j = r.json()
+        config = configparser.ConfigParser()
+        config.read('CONFIG.INI')
+        usdcval = int(config['DEFAULT']['coinvalusdc'])
+        return j[int(usdcval)]['last_price']  # best bid usdc, for calculation
+
+    def orderbook_usdc_snap_bid():
+        """returns the first usdc orderbook entry (in exchange)"""
+        conn = http.client.HTTPSConnection("api.onetrading.com")
+        headers = {'Accept': "application/json"}
+        conn.request("GET", "/fast/v1/order-book/USDC_EUR", headers=headers)
+        res = conn.getresponse()
+
+        dat = res.read()
+        data = dat.decode("utf-8")
+        jdata = json.loads(data)
+        jsonbid = jdata['bids'][0]['price']
+        return jsonbid
+
+    print(" - USDC INFOS CURRENTLY - ")
+    print("usdc price: ", usdcnow(), "€")
+    print("order-book price: ", orderbook_usdc_snap_bid(), "€")
+    print(" - ASK Order - ")
+    """gibt den usdc amount des wallets wieder, wird fuer den verkauf benötigt"""
+    config = configparser.ConfigParser()
+    config.read('CONFIG.INI')
+    bpkey = str(config['DEFAULT']['apikey'])
+    headers = {
+        'Accept': 'application/json',
+        'Authorization': bpkey
+    }
+    r = requests.get('https://api.onetrading.com/fast/v1/account/balances', params={
+    }, headers=headers)
+    # print(r.json())
+    j = r.json()
+    e = j['balances']
+    a = e[3]['available']
+    b = float(a)
+    #av = "%.5f" % (b - b % 0.00001)
+    print("your absolute USDC Value: ", a)
+    #print("sell amount of USDC wallet: ", av)
+    """post usdc ask order on marketprice (first orderbook entry)"""
+    config = configparser.ConfigParser()
+    config.read('CONFIG.INI')
+    bpkey = str(config['DEFAULT']['apikey'])
+    headers = {
+        'Accept': 'application/json',
+        'Authorization': bpkey
+    }
+    r = requests.post('https://api.onetrading.com/fast/v1/account/orders',
+                      json={"instrument_code": "USDC_EUR","type": "LIMIT" , "side": "SELL", "amount": str(a), "price": str(orderbook_usdc_snap_bid()), "time_in_force": "IMMEDIATE_OR_CANCELLED"},             # , "time_in_force": "GOOD_TILL_CANCELLED"
+                      headers=headers)
+    print("used order-book price: ", orderbook_usdc_snap_bid(), "€")
+    print(" - carry out / err msg - ")
+    print(r.json())
+    data = json.dumps(r.json())
+    with open("_selllog_usdc.json", "a") as f:
+        f.write(stringtimenow() + " - " + data + '\r\n')
+        #f.write(data + '\r\n')
+    print("")
+    print(">>>")
