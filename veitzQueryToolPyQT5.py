@@ -68,6 +68,18 @@ class MyWidget(QWidget):
         button4.clicked.connect(self.button_usdc_sell)
         grid_layout.addWidget(button4, 1, 1)
 
+        """
+        button5 = QPushButton('buy ETH (with usdc)', self)
+        button5.setStyleSheet("background-color: #bfe5ad;")
+        button5.clicked.connect(self.button_eth_buy)
+        grid_layout.addWidget(button5, 2, 0)
+
+        button6 = QPushButton('sell ETH (to usdc)', self)
+        button6.setStyleSheet("background-color: #f09292;")
+        button6.clicked.connect(self.button_eth_sell)
+        grid_layout.addWidget(button6, 2, 1)
+        """
+
         # Exit Button hinzugefügt
         exitbutton = QPushButton('Exit', self)
         exitbutton.setStyleSheet("background-color: #f0f0f0; color: #333333; border: 1px solid #cccccc;")
@@ -118,12 +130,52 @@ class MyWidget(QWidget):
 
 
     def button_usdc_buy(self):
-        QMessageBox.information(self, 'Information', 'kaufe USDC:\n \n'
-                                                     'in development...')
+        try:
+            self.text_edit.append("- buy USDC trigger - Datetime: " + veitzQueryToolFunctions.stringtimenow())
+            with redirect_stdout_ext(self.text_edit):
+                reply = QMessageBox.question(self, 'Bestätigung',
+                                             "Möchten Sie USDC kaufen? (alle EUR zu USDC))",
+                                             QMessageBox.Yes | QMessageBox.No,
+                                             QMessageBox.No)
+                if reply == QMessageBox.Yes:
+                    veitzQueryToolFunctions.buy_trigger_usdc()
+                else:
+                    print("aborted...")
+                    print("")
+                    print(">>>")
+        except Exception as e:
+            self.text_edit.append(f"Error in running external buy_trigger(): {e}")
+
+
 
     def button_usdc_sell(self):
-        QMessageBox.information(self, 'Information', 'verkaufe USDC:\n \n'
+        try:
+            self.text_edit.append("- sell USDC trigger - Datetime: " + veitzQueryToolFunctions.stringtimenow())
+            with redirect_stdout_ext(self.text_edit):
+                reply = QMessageBox.question(self, 'Bestätigung',
+                                             "Möchten Sie USDC verkaufen? (alle USDC zu EUR)",
+                                             QMessageBox.Yes | QMessageBox.No,
+                                             QMessageBox.No)
+                if reply == QMessageBox.Yes:
+                    veitzQueryToolFunctions.sell_trigger()
+                else:
+                    print("aborted...")
+                    print("")
+                    print(">>>")
+        except Exception as e:
+            self.text_edit.append(f"Error in running external sell_trigger(): {e}")
+
+
+
+    def button_eth_buy(self):
+        QMessageBox.information(self, 'Information', 'kaufe ETH:\n \n'
                                                      'in development...')
+
+    def button_eth_sell(self):
+        QMessageBox.information(self, 'Information', 'verkaufe ETH:\n \n'
+                                                     'in development...')
+
+
 
     def buttonExitClicked(self):
         reply = QMessageBox.question(self, 'Bestätigung',

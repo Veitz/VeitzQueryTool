@@ -132,6 +132,46 @@ def json_search():
 json_search()
 
 
+def extract_and_save_balances():
+    """ Unterfunktion: extrahiert relevante Balances und speichert sie unter [WALLET] in der config.ini """
+    config = configparser.ConfigParser()
+    config.read('CONFIG.INI')
+    bpkey = str(config['DEFAULT']['apikey'])
+    headers = {
+        'Accept': 'application/json',
+        'Authorization': bpkey
+    }
+    r = requests.get('https://api.onetrading.com/fast/v1/account/balances', params={
+    }, headers=headers)
+    # print(r.json())
+    j = r.json()
+    databalance = j['balances']
+    # print(databalance)
+
+    currencies = ("USDC", "BTC", "EUR", "ETH")
+    balances_index = {}
+
+    # Index jedes Eintrags ermitteln
+    for idx, entry in enumerate(databalance):
+        code = entry.get("currency_code")
+        if code in currencies:
+            balances_index[code] = str(idx)  # index als String speichern für Config
+
+    config = configparser.ConfigParser()
+    config.read('CONFIG.INI')
+    if "WALLET" not in config:
+        config["WALLET"] = {}
+    # Einträge aktualisieren oder hinzufügen
+    for cur, idx in balances_index.items():
+        config["WALLET"][cur] = idx
+    # Änderungen in die Datei schreiben
+    with open('CONFIG.INI', "w") as f:
+        config.write(f)
+    # print("Indices im [WALLET]-Block gespeichert:", balances_index)
+    # return balances_index
+extract_and_save_balances()
+
+
 def json_search2():
     """Output of all value pairs and their information."""
     headers = {
@@ -163,6 +203,7 @@ def confcheck():
     btcval = int(config['DEFAULT']['coinvalbtc'])
     ethval = int(config['DEFAULT']['coinvaleth'])
     usdcval = int(config['DEFAULT']['coinvalusdc'])
+    extract_and_save_balances()
     print('')
     print('use JSON-Value for BTC:', btcval)
     print('use JSON-Value for ETH:', ethval)
@@ -318,8 +359,64 @@ def show_last100():
     print(">>>")
 
 
+def changelog():
+    with open('changelog.md', 'r') as info:
+        for line in info:
+            print(line)
+        print("")
+        print(">>>")
+
+
+def get_version():
+    config = configparser.ConfigParser()
+    config.read('CONFIG.INI')
+    vnr = str(config['VERSION']['versionnum'])
+    return vnr
+
+
+
+##############
+### wallet ###
+##############
+
 def walletinfo():
-    """get wallet-balance"""
+    """get wallet-balance Funktion"""
+    def extract_and_save_balances():
+        """ Unterfunktion: extrahiert relevante Balances und speichert sie unter [WALLET] in der config.ini """
+        config = configparser.ConfigParser()
+        config.read('CONFIG.INI')
+        bpkey = str(config['DEFAULT']['apikey'])
+        headers = {
+            'Accept': 'application/json',
+            'Authorization': bpkey
+        }
+        r = requests.get('https://api.onetrading.com/fast/v1/account/balances', params={
+        }, headers=headers)
+        # print(r.json())
+        j = r.json()
+        databalance = j['balances']
+        #print(databalance)
+        currencies = ("USDC", "BTC", "EUR", "ETH")
+        balances_index = {}
+        # Index jedes Eintrags ermitteln
+        for idx, entry in enumerate(databalance):
+            code = entry.get("currency_code")
+            if code in currencies:
+                balances_index[code] = str(idx)  # index als String speichern für Config
+        config = configparser.ConfigParser()
+        config.read('CONFIG.INI')
+        if "WALLET" not in config:
+            config["WALLET"] = {}
+        # Einträge aktualisieren oder hinzufügen
+        for cur, idx in balances_index.items():
+            config["WALLET"][cur] = idx
+        # Änderungen in die Datei schreiben
+        with open('CONFIG.INI', "w") as f:
+            config.write(f)
+        #print("Indices im [WALLET]-Block gespeichert:", balances_index)
+        #return balances_index
+    extract_and_save_balances()
+
     def btcBestBid():
         """returns the current btc market price. is required for the calculation of the btc amount in the fiat wallet"""
         headers = {
@@ -364,7 +461,12 @@ def walletinfo():
 
     config = configparser.ConfigParser()
     config.read('CONFIG.INI')
+    usdcindex = int(config['WALLET']['usdc'])
+    eurindex = int(config['WALLET']['eur'])
+    btcindex = int(config['WALLET']['btc'])
+    ethindex = int(config['WALLET']['eth'])
     bpkey = str(config['DEFAULT']['apikey'])
+    #hier die anderen variablen holen (fuer currencies)
     headers = {
         'Accept': 'application/json',
         'Authorization': bpkey
@@ -379,14 +481,14 @@ def walletinfo():
     #print(ethBestBid())
     try:
         print("- aktuelle Werte der Wallet's -")
-        print("currency_code: ", e[0]['currency_code'])  # fiat, muss auch in sell_trigger() angepasst werden!!         # euro
-        print("available:     ", e[0]['available'], " sind ", float(e[0]['available']) / float(btcBestBid()), "btc")  # euro
-        print("currency_code: ", e[4]['currency_code'])  # btc muss auch in buy_trigger() angepasst werden !!           # btc
-        print("available:     ", e[4]['available'], " sind ", float(btcBestBid()) * float(e[4]['available']), "€")  # btc
-        print("currency_code: ", e[1]['currency_code'])  # eth
-        print("available:     ", e[1]['available'])  # eth
-        print("currency_code: ", e[3]['currency_code'])  # usdc
-        print("available:     ", e[3]['available'], " sind ", float(usdcBestBid()) * float(e[3]['available']), "€")  # usdc
+        print("currency_code: ", e[eurindex]['currency_code'])  # fiat, muss auch in sell_trigger() angepasst werden!!         # euro
+        print("available:     ", e[eurindex]['available'], " sind ", float(e[eurindex]['available']) / float(btcBestBid()), "btc")  # euro
+        print("currency_code: ", e[btcindex]['currency_code'])  # btc muss auch in buy_trigger() angepasst werden !!           # btc
+        print("available:     ", e[btcindex]['available'], " sind ", float(btcBestBid()) * float(e[btcindex]['available']), "€")  # btc
+        print("currency_code: ", e[ethindex]['currency_code'])  # eth
+        print("available:     ", e[ethindex]['available'])  # eth
+        print("currency_code: ", e[usdcindex]['currency_code'])  # usdc
+        print("available:     ", e[usdcindex]['available'], " sind ", float(usdcBestBid()) * float(e[usdcindex]['available']), "€")  # usdc
         # print("currency_code: ", e[4]['currency_code'])
         # print("available:     ", e[4]['available'])
         # print('HINWEIS: Currencies mit gesetztem Stop-Loss sind LOCKED und werden daher nicht angezeigt!')
@@ -396,24 +498,10 @@ def walletinfo():
     print(">>>")
 
 
-def changelog():
-    with open('changelog.md', 'r') as info:
-        for line in info:
-            print(line)
-        print("")
-        print(">>>")
 
-
-def get_version():
-    config = configparser.ConfigParser()
-    config.read('CONFIG.INI')
-    vnr = str(config['VERSION']['versionnum'])
-    return vnr
-
-
-
-
+#######################
 ### trading trigger ###
+#######################
 
 def sell_trigger():
     def btcnow():
