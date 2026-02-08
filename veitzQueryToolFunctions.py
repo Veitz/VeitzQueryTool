@@ -133,7 +133,7 @@ json_search()
 
 
 def extract_and_save_balances():
-    """ Unterfunktion: extrahiert relevante Balances und speichert sie unter [WALLET] in der config.ini """
+    """ extrahiert relevante Balances-Indexe (Nummern) und speichert sie unter [WALLET] in der config.ini """
     config = configparser.ConfigParser()
     config.read('CONFIG.INI')
     bpkey = str(config['DEFAULT']['apikey'])
@@ -541,6 +541,7 @@ def sell_trigger():
     """gibt den btc amount des wallets wieder, wird zum verkauf benötigt"""
     config = configparser.ConfigParser()
     config.read('CONFIG.INI')
+    btcindex = int(config['WALLET']['btc'])
     bpkey = str(config['DEFAULT']['apikey'])
     headers = {
         'Accept': 'application/json',
@@ -551,15 +552,15 @@ def sell_trigger():
     # print(r.json())
     j = r.json()
     e = j['balances']
-    a = e[4]['available']
+    a = e[btcindex]['available']
     b = float(a)
     av = "%.5f" % (b - b % 0.00001)
     print("your absolute BTC Value: ", a)
     print("sell amount of BTC wallet: ", av)
     """post ask order on marketprice"""
-    config = configparser.ConfigParser()
-    config.read('CONFIG.INI')
-    bpkey = str(config['DEFAULT']['apikey'])
+    #config = configparser.ConfigParser()
+    #config.read('CONFIG.INI')
+    #bpkey = str(config['DEFAULT']['apikey'])
     headers = {
         'Accept': 'application/json',
         'Authorization': bpkey
@@ -618,9 +619,10 @@ def buy_trigger():
     print(" - BID Order - ")
     print('BTC Value now : ', btcnow(), '$')
     # print("order-book price: ", orderbook_snap_ask(), "€")    # is displayed at the bottom of the order-book-price used
-    """gibt die USDC Wallet-Balance aus"""
+    """gibt die FIAT Wallet-Balance aus"""
     config = configparser.ConfigParser()
     config.read('CONFIG.INI')
+    usdcindex = int(config['WALLET']['usdc'])
     bpkey = str(config['DEFAULT']['apikey'])
     headers = {
         'Accept': 'application/json',
@@ -632,18 +634,22 @@ def buy_trigger():
     j = r.json()
     e = j['balances']
     try:
-        usdcval2 = e[3]['available']
+        usdcval2 = e[usdcindex]['available']
         #fiatval3 = round(float(fiatval2), 2)
         print('my USDC amount : ', usdcval2)
     except KeyError:
         print("ERROR: in api_getbalance.py or JSON doesn't exist")
+
     bbv = floor(float(usdcval2)) / float(orderbook_snap_ask())  # Original calculation from btcnow()
+    print("bbv", bbv)
     bbvr = round(bbv, 5) - float(0.0001)
-    print('your BTC buy amount:', bbvr)
+    print('your BTC buy amount in USDC:', bbvr)
+
     ### buy BTC at Limitprice ###
-    config = configparser.ConfigParser()
-    config.read('CONFIG.INI')
-    bpkey = str(config['DEFAULT']['apikey'])
+    #config = configparser.ConfigParser()
+    #config.read('CONFIG.INI')
+    #bpkey = str(config['DEFAULT']['apikey'])
+
     headers = {
         'Accept': 'application/json',
         'Authorization': bpkey
@@ -651,6 +657,7 @@ def buy_trigger():
     r = requests.post('https://api.onetrading.com/fast/v1/account/orders',
                       json={"instrument_code": "BTC_USDC", "type": "LIMIT", "side": "BUY", "amount": str(bbvr), "price": str(orderbook_snap_ask()), "time_in_force": "IMMEDIATE_OR_CANCELLED"},  # , "time_in_force": "GOOD_TILL_CANCELLED"
                       headers=headers)
+
     print("used order-book price: ", orderbook_snap_ask(), "$")
     print(" - carry out / err msg - ")
     print(r.json())
@@ -701,6 +708,7 @@ def sell_trigger_usdc():
     """gibt den usdc amount des wallets wieder, wird fuer den verkauf benötigt"""
     config = configparser.ConfigParser()
     config.read('CONFIG.INI')
+    usdcindex = int(config['WALLET']['usdc'])
     bpkey = str(config['DEFAULT']['apikey'])
     headers = {
         'Accept': 'application/json',
@@ -711,15 +719,15 @@ def sell_trigger_usdc():
     # print(r.json())
     j = r.json()
     e = j['balances']
-    a = e[3]['available']
+    a = e[usdcindex]['available']
     b = float(a)
     #av = "%.5f" % (b - b % 0.00001)
     print("your absolute USDC Value: ", a)
     #print("sell amount of USDC wallet: ", av)
     """post usdc ask order on marketprice (first orderbook entry)"""
-    config = configparser.ConfigParser()
-    config.read('CONFIG.INI')
-    bpkey = str(config['DEFAULT']['apikey'])
+    #config = configparser.ConfigParser()
+    #config.read('CONFIG.INI')
+    #bpkey = str(config['DEFAULT']['apikey'])
     headers = {
         'Accept': 'application/json',
         'Authorization': bpkey
@@ -778,6 +786,8 @@ def buy_trigger_usdc():
     #print('USDC Value now : ', usdcnow(), '€')
     config = configparser.ConfigParser()
     config.read('CONFIG.INI')
+    usdcindex = int(config['WALLET']['usdc'])
+    eurindex = int(config['WALLET']['eur'])
     bpkey = str(config['DEFAULT']['apikey'])
     headers = {
         'Accept': 'application/json',
@@ -790,8 +800,8 @@ def buy_trigger_usdc():
     e = j['balances']
     #print(e)
     try:
-        usdcval2 = e[0]['available']
-        eurval2 = float(e[1]['available'])
+        usdcval2 = e[usdcindex]['available']
+        eurval2 = float(e[eurindex]['available'])
         print('USDC amount : ', usdcval2)
     except KeyError:
         print("ERROR: in api_getbalance.py or JSON doesn't exist")
@@ -799,9 +809,9 @@ def buy_trigger_usdc():
     print('EUR buy amount:', eurvalbuyorder)
 
     ### buy BTC at Limitprice ###
-    config = configparser.ConfigParser()
-    config.read('CONFIG.INI')
-    bpkey = str(config['DEFAULT']['apikey'])
+    #config = configparser.ConfigParser()
+    #config.read('CONFIG.INI')
+    #bpkey = str(config['DEFAULT']['apikey'])
     headers = {
         'Accept': 'application/json',
         'Authorization': bpkey
