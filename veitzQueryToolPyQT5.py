@@ -157,7 +157,7 @@ class MyWidget(QWidget):
                                              QMessageBox.Yes | QMessageBox.No,
                                              QMessageBox.No)
                 if reply == QMessageBox.Yes:
-                    veitzQueryToolFunctions.sell_trigger()
+                    veitzQueryToolFunctions.sell_trigger_usdc()
                 else:
                     print("aborted...")
                     print("")
