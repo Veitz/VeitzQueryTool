@@ -721,8 +721,8 @@ def sell_trigger_usdc():
     e = j['balances']
     a = e[usdcindex]['available']
     b = float(a)
-    #av = "%.5f" % (b - b % 0.00001)
-    print("your absolute USDC Value: ", a)
+    av = "%.2f" % (b - b % 0.01)
+    print("your absolute USDC Value: ", av)
     #print("sell amount of USDC wallet: ", av)
     """post usdc ask order on marketprice (first orderbook entry)"""
     #config = configparser.ConfigParser()
@@ -733,7 +733,7 @@ def sell_trigger_usdc():
         'Authorization': bpkey
     }
     r = requests.post('https://api.onetrading.com/fast/v1/account/orders',
-                      json={"instrument_code": "USDC_EUR","type": "LIMIT" , "side": "SELL", "amount": str(a), "price": str(orderbook_usdc_snap_bid()), "time_in_force": "IMMEDIATE_OR_CANCELLED"},             # , "time_in_force": "GOOD_TILL_CANCELLED"
+                      json={"instrument_code": "USDC_EUR","type": "LIMIT" , "side": "SELL", "amount": str(av), "price": str(orderbook_usdc_snap_bid()), "time_in_force": "IMMEDIATE_OR_CANCELLED"},             # , "time_in_force": "GOOD_TILL_CANCELLED"
                       headers=headers)
     print("used order-book price: ", orderbook_usdc_snap_bid(), "€")
     print(" - carry out / err msg - ")
