@@ -534,6 +534,18 @@ def sell_trigger():
         jsonbid = jdata['bids'][0]['price']
         return jsonbid
 
+    def orderbook_snap_ask():
+        conn = http.client.HTTPSConnection("api.onetrading.com")
+        headers = {'Accept': "application/json"}
+        conn.request("GET", "/fast/v1/order-book/BTC_USDC", headers=headers)
+        res = conn.getresponse()
+
+        dat = res.read()
+        data = dat.decode("utf-8")
+        jdata = json.loads(data)
+        jsonask = jdata['asks'][0]['price']
+        return jsonask
+
     print(" - BTC INFOS CURRENTLY - ")
     print("btc price: ", btcnow(), "$")
     print("order-book price: ", orderbook_snap_bid(), "$")
@@ -557,24 +569,33 @@ def sell_trigger():
     av = "%.5f" % (b - b % 0.00001)
     print("your absolute BTC Value: ", a)
     print("sell amount of BTC wallet: ", av)
-    """post ask order on marketprice"""
-    #config = configparser.ConfigParser()
-    #config.read('CONFIG.INI')
-    #bpkey = str(config['DEFAULT']['apikey'])
-    headers = {
-        'Accept': 'application/json',
-        'Authorization': bpkey
-    }
-    r = requests.post('https://api.onetrading.com/fast/v1/account/orders',
-                      json={"instrument_code": "BTC_USDC","type": "LIMIT" , "side": "SELL", "amount": str(av), "price": str(orderbook_snap_bid()), "time_in_force": "IMMEDIATE_OR_CANCELLED"},             # , "time_in_force": "GOOD_TILL_CANCELLED"
-                      headers=headers)
-    print("used order-book price: ", orderbook_snap_bid(), "$")
-    print(" - carry out / err msg - ")
-    print(r.json())
-    data = json.dumps(r.json())
-    with open("_selllog.json", "a") as f:
-        f.write(stringtimenow() + " - " + data + '\r\n')
-        #f.write(data + '\r\n')
+
+    spread = float(orderbook_snap_ask()) - float(orderbook_snap_bid())
+    spreadorderbook = float(round(spread, 2))
+    # print("spreadorderbook: ", spreadorderbook)
+    spreadbtc = float(btcnow())
+    # print("spreadbtc: ", spreadbtc  * 0.05)
+    if spreadorderbook >= spreadbtc * 0.05:  # 5% spread or higher, the order will not executed!
+        print('terminated...spread to high')
+    else:
+        """post ask order on marketprice"""
+        #config = configparser.ConfigParser()
+        #config.read('CONFIG.INI')
+        #bpkey = str(config['DEFAULT']['apikey'])
+        headers = {
+            'Accept': 'application/json',
+            'Authorization': bpkey
+        }
+        r = requests.post('https://api.onetrading.com/fast/v1/account/orders',
+                        json={"instrument_code": "BTC_USDC","type": "LIMIT" , "side": "SELL", "amount": str(av), "price": str(orderbook_snap_bid()), "time_in_force": "IMMEDIATE_OR_CANCELLED"},             # , "time_in_force": "GOOD_TILL_CANCELLED"
+                        headers=headers)
+        print("used order-book price: ", orderbook_snap_bid(), "$")
+        print(" - carry out / err msg - ")
+        print(r.json())
+        data = json.dumps(r.json())
+        with open("_selllog.json", "a") as f:
+            f.write(stringtimenow() + " - " + data + '\r\n')
+            #f.write(data + '\r\n')
     print("")
     print(">>>")
     #print(1 * 40000 / 100)  # 1% von 40000
@@ -613,6 +634,18 @@ def buy_trigger():
         jsonask = jdata['asks'][0]['price']
         return jsonask
 
+    def orderbook_snap_bid():
+        conn = http.client.HTTPSConnection("api.onetrading.com")
+        headers = {'Accept': "application/json"}
+        conn.request("GET", "/fast/v1/order-book/BTC_USDC", headers=headers)
+        res = conn.getresponse()
+
+        dat = res.read()
+        data = dat.decode("utf-8")
+        jdata = json.loads(data)
+        jsonbid = jdata['bids'][0]['price']
+        return jsonbid
+
     print(" - BTC INFOS CURRENTLY - ")
     print("btc price: ", btcnow(), "$")
     print("order-book price: ", orderbook_snap_ask(), "$")
@@ -642,29 +675,37 @@ def buy_trigger():
 
     bbv = floor(float(usdcval2)) / float(orderbook_snap_ask())  # Original calculation from btcnow()
     print("bbv", bbv)
-    bbvr = round(bbv, 5) - float(0.0001)
+    #bbvr = round(bbv, 5) - float(0.0001)
+    bbvr = "%.5f" % (bbv - bbv % 0.00001)
     print('your BTC buy amount in USDC:', bbvr)
 
-    ### buy BTC at Limitprice ###
-    #config = configparser.ConfigParser()
-    #config.read('CONFIG.INI')
-    #bpkey = str(config['DEFAULT']['apikey'])
+    spread = float(orderbook_snap_ask()) - float(orderbook_snap_bid())
+    spreadorderbook = float(round(spread, 2))
+    #print("spreadorderbook: ", spreadorderbook)
+    spreadbtc = float(btcnow())
+    #print("spreadbtc: ", spreadbtc  * 0.05)
+    if spreadorderbook >= spreadbtc * 0.05:              # 5% spread or higher, the order will not executed!
+        print('terminated...spread to high')
+    else:
+        ### buy BTC at Limitprice ###
+        #config = configparser.ConfigParser()
+        #config.read('CONFIG.INI')
+        #bpkey = str(config['DEFAULT']['apikey'])
 
-    headers = {
-        'Accept': 'application/json',
-        'Authorization': bpkey
-    }
-    r = requests.post('https://api.onetrading.com/fast/v1/account/orders',
-                      json={"instrument_code": "BTC_USDC", "type": "LIMIT", "side": "BUY", "amount": str(bbvr), "price": str(orderbook_snap_ask()), "time_in_force": "IMMEDIATE_OR_CANCELLED"},  # , "time_in_force": "GOOD_TILL_CANCELLED"
-                      headers=headers)
-
-    print("used order-book price: ", orderbook_snap_ask(), "$")
-    print(" - carry out / err msg - ")
-    print(r.json())
-    data = json.dumps(r.json())
-    with open("_buylog.json", "a") as f:
-        f.write(stringtimenow() + " - " + data + '\r\n')
-        #f.write(data + '\r\n')
+        headers = {
+            'Accept': 'application/json',
+            'Authorization': bpkey
+        }
+        r = requests.post('https://api.onetrading.com/fast/v1/account/orders',
+                          json={"instrument_code": "BTC_USDC", "type": "LIMIT", "side": "BUY", "amount": str(bbvr), "price": str(orderbook_snap_ask()), "time_in_force": "IMMEDIATE_OR_CANCELLED"},  # , "time_in_force": "GOOD_TILL_CANCELLED"
+                          headers=headers)
+        print("used order-book price: ", orderbook_snap_ask(), "$")
+        print(" - carry out / err msg - ")
+        print(r.json())
+        data = json.dumps(r.json())
+        with open("_buylog.json", "a") as f:
+            f.write(stringtimenow() + " - " + data + '\r\n')
+            #f.write(data + '\r\n')
     print("")
     print(">>>")
 
