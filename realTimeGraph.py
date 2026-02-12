@@ -35,7 +35,7 @@ class GraphUpdaterThread(QThread):
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("ONETRADING - BTC Echtzeit-Graph")
+        self.setWindowTitle("ONETRADING - BTC Echtzeit-Graph ($)")
         self.setGeometry(100, 100, 800, 600)
 
         self.text_area = QTextEdit(self)
@@ -100,7 +100,7 @@ class MainWindow(QMainWindow):
     def plot_werte(self, werte):
         self.ax.clear()
         self.ax.plot(werte, marker='o', linestyle='-')
-        self.ax.set_title("Letzte 99 BTC-Werte (Echtzeit-Update - Onetrading)")
+        self.ax.set_title("Letzte 99 BTC-Werte in $ (Echtzeit-Update - Onetrading)")
         self.ax.set_xlabel("Messung")
         self.ax.set_ylabel("BTC-Wert")
         self.ax.grid(True)
