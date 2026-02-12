@@ -22,12 +22,12 @@ class BTCInfoApp(QtWidgets.QWidget):
 
         # Labels für die Beschreibungen und Werte erstellen
         self.label_time_desc = QtWidgets.QLabel("Zeitstempel-Server:")
-        self.label_last_price_desc = QtWidgets.QLabel("Letzter Preis (€):")
-        self.label_high_desc = QtWidgets.QLabel("Hoch 24h (€):")
-        self.label_low_desc = QtWidgets.QLabel("Tief 24h (€):")
-        self.label_orderbook_buy_desc = QtWidgets.QLabel("Orderbook Kauf (€):")
-        self.label_orderbook_sell_desc = QtWidgets.QLabel("Orderbook Verkauf (€):")
-        self.label_spread_desc = QtWidgets.QLabel("Spread (€):")
+        self.label_last_price_desc = QtWidgets.QLabel("Letzter Preis ($):")
+        self.label_high_desc = QtWidgets.QLabel("Hoch 24h ($):")
+        self.label_low_desc = QtWidgets.QLabel("Tief 24h ($):")
+        self.label_orderbook_buy_desc = QtWidgets.QLabel("Orderbook Kauf ($):")
+        self.label_orderbook_sell_desc = QtWidgets.QLabel("Orderbook Verkauf ($):")
+        self.label_spread_desc = QtWidgets.QLabel("Spread ($):")
 
         # Labels für die angezeigten Werte
         self.label_time = QtWidgets.QLabel("")
@@ -86,7 +86,7 @@ class BTCInfoApp(QtWidgets.QWidget):
 
         headers = {'Accept': 'application/json'}
         response = requests.get('https://api.onetrading.com/fast/v1/market-ticker', params={
-            "instrument_code": "BTC_EUR"
+            "instrument_code": "BTC_USDC"
         }, headers=headers)
         response.raise_for_status()
         ticker_data = response.json()
@@ -110,7 +110,7 @@ class BTCInfoApp(QtWidgets.QWidget):
     def orderbook_btc_snap(self, order_type):
         conn = http.client.HTTPSConnection("api.onetrading.com")
         headers = {'Accept': "application/json"}
-        conn.request("GET", "/fast/v1/order-book/BTC_EUR", headers=headers)
+        conn.request("GET", "/fast/v1/order-book/BTC_USDC", headers=headers)
         response = conn.getresponse()
         data = json.loads(response.read().decode("utf-8"))
         return data[order_type][0]['price']
