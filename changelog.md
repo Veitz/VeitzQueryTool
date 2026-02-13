@@ -25,4 +25,4 @@ REST API: *https://docs.onetrading.com/#fast-upgrade---*
 
 ### CHANGELOG v2.3:
 - fixed API changes
-- adjustments currencies
+- adjustments for all currencies
