@@ -25,4 +25,4 @@ REST API: *https://docs.onetrading.com/#fast-upgrade---*
 
 ### CHANGELOG v2.3:
 - fixed API changes
-- known issues - realtime tools for ontrading is currently broken
+- adjustments currencies
