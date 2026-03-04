@@ -492,6 +492,8 @@ def walletinfo():
         # print("currency_code: ", e[4]['currency_code'])
         # print("available:     ", e[4]['available'])
         # print('HINWEIS: Currencies mit gesetztem Stop-Loss sind LOCKED und werden daher nicht angezeigt!')
+    #except Exception as e:
+    #    print("error ", {e})
     except KeyError:
         print("ERROR: in api_getbalance.py or JSON doesn't exist")
     print("")
@@ -676,7 +678,7 @@ def buy_trigger():
     bbv = floor(float(usdcval2)) / float(orderbook_snap_ask())  # Original calculation from btcnow()
     print("bbv", bbv)
     #bbvr = round(bbv, 5) - float(0.0001)
-    bbvr = "%.5f" % (bbv - bbv % 0.00001)
+    bbvr = "%.5f" % (bbv - bbv % 0.00001)   # eventuell hier eine Stelle weniger
     print('your BTC buy amount in USDC:', bbvr)
 
     spread = float(orderbook_snap_ask()) - float(orderbook_snap_bid())
@@ -846,7 +848,8 @@ def buy_trigger_usdc():
         print('USDC amount : ', usdcval2)
     except KeyError:
         print("ERROR: in api_getbalance.py or JSON doesn't exist")
-    eurvalbuyorder = round(eurval2, 2) - float(0.01)
+    eurvalbuyorder = "%.2f" % (eurval2 - eurval2 % 0.01)
+    #eurvalbuyorder = round(eurval2, 2) - float(0.01)
     print('EUR buy amount:', eurvalbuyorder)
 
     ### buy BTC at Limitprice ###
